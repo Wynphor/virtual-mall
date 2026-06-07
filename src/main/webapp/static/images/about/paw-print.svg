@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 66" role="img" aria-label="小巧黑色猫爪印">
+  <path d="M36 34
+           C30 34 22 40 21 48
+           C20 56 27 60 34 56
+           C35.5 55 36.5 55 38 56
+           C45 60 52 56 51 48
+           C50 40 42 34 36 34Z"
+        fill="#111"/>
+  <ellipse cx="18" cy="27" rx="5.7" ry="7.8" transform="rotate(-24 18 27)" fill="#111"/>
+  <ellipse cx="30" cy="18" rx="5.9" ry="8.4" transform="rotate(-8 30 18)" fill="#111"/>
+  <ellipse cx="42" cy="18" rx="5.9" ry="8.4" transform="rotate(8 42 18)" fill="#111"/>
+  <ellipse cx="54" cy="27" rx="5.7" ry="7.8" transform="rotate(24 54 27)" fill="#111"/>
+</svg>

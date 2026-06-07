@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mall.mapper.OrderMapper">
+
+    <insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mall_order (order_no, user_id, contact, total_price, status, query_password, pay_method, create_time)
+        VALUES (#{orderNo}, #{userId}, #{contact}, #{totalPrice}, #{status}, #{queryPassword}, #{payMethod}, NOW())
+    </insert>
+
+    <select id="findByOrderNo" parameterType="String" resultType="Order">
+        SELECT * FROM mall_order WHERE order_no = #{orderNo}
+    </select>
+
+    <select id="findById" parameterType="int" resultType="Order">
+        SELECT * FROM mall_order WHERE id = #{id}
+    </select>
+
+    <select id="findByUserId" resultType="Order">
+        SELECT * FROM mall_order WHERE user_id = #{userId} ORDER BY create_time DESC LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserId" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM mall_order WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByContact" parameterType="String" resultType="Order">
+        SELECT * FROM mall_order WHERE contact = #{contact} ORDER BY create_time DESC
+    </select>
+
+    <select id="findAll" resultType="Order">
+        SELECT * FROM mall_order ORDER BY create_time DESC LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="findByStatus" resultType="Order">
+        SELECT * FROM mall_order WHERE status = #{status} ORDER BY create_time DESC LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM mall_order
+    </select>
+
+    <select id="countByStatus" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM mall_order WHERE status = #{status}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE mall_order SET status = #{status} WHERE id = #{id} AND status = #{expectedStatus}
+    </update>
+
+    <update id="updatePayTime">
+        UPDATE mall_order SET pay_time = NOW() WHERE id = #{id}
+    </update>
+</mapper>

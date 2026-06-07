@@ -1,0 +1,24 @@
+# IDEA
+.idea/
+*.iml
+out/
+
+# Maven
+target/
+*.jar
+*.war
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local config / env
+.env
+.env.*
+*.local
+
+# 生成的二维码图片
+src/main/webapp/static/images/qrcode/*.png

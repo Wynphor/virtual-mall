@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mall.mapper.CardKeyMapper">
+
+    <select id="findBySkuIdAndStatus" resultType="CardKey">
+        SELECT * FROM card_key WHERE sku_id = #{skuId} AND status = #{status} LIMIT #{limit} FOR UPDATE
+    </select>
+
+    <select id="findById" parameterType="int" resultType="CardKey">
+        SELECT * FROM card_key WHERE id = #{id}
+    </select>
+
+    <select id="findByOrderItemId" parameterType="int" resultType="CardKey">
+        SELECT * FROM card_key WHERE order_item_id = #{orderItemId}
+    </select>
+
+    <select id="findBySkuId" parameterType="int" resultType="CardKey">
+        SELECT * FROM card_key WHERE sku_id = #{skuId} ORDER BY add_time DESC
+    </select>
+
+    <select id="countBySkuIdAndStatus" resultType="int">
+        SELECT COUNT(*) FROM card_key WHERE sku_id = #{skuId} AND status = #{status}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE card_key SET status = #{status}, order_item_id = #{orderItemId}, sell_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="batchUpdateStatus">
+        UPDATE card_key SET status = #{status}, order_item_id = #{orderItemId}, sell_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        <if test="expectedStatus != null">AND status = #{expectedStatus}</if>
+    </update>
+
+    <insert id="insert" parameterType="CardKey" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO card_key (sku_id, content, status) VALUES (#{skuId}, #{content}, #{status})
+    </insert>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM card_key
+    </select>
+
+    <select id="findAll" resultType="CardKey">
+        SELECT * FROM card_key ORDER BY add_time DESC LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="findAllWithProduct" resultType="CardKey">
+        SELECT ck.*, p.name AS productName, s.spec_name AS specName
+        FROM card_key ck
+        JOIN product_sku s ON ck.sku_id = s.id
+        JOIN product p ON s.product_id = p.id
+        ORDER BY ck.add_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+</mapper>
