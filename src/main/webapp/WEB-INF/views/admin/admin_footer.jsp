@@ -3,9 +3,11 @@
 <footer class="footer">
     <div class="footer-brand">© 2026 VIRTUAL MALL</div>
     <div class="footer-sub">Admin Panel · SSM Course Design</div>
+    <div class="footer-signature">By Wynphor</div>
     <div class="footer-quote">Cease to struggle and you cease to live</div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/common.js"></script>
 <script>
     (function() {
         var container = document.getElementById('navLinks');

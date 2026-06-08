@@ -2,6 +2,7 @@
 <footer class="footer">
     <div class="footer-brand">© 2026 VIRTUAL MALL</div>
     <div class="footer-sub">虚拟数字商城 · SSM Course Design</div>
+    <div class="footer-signature">By Wynphor</div>
     <div class="footer-social">
         <span class="social-icon" title="QQ">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7v2.5S3.5 13 3.5 15c0 2 1.5 3 3 3.5L5 22l4-2c.8.2 1.6.3 2.5.3s1.7-.1 2.5-.3l4 2-1.5-3.5c1.5-.5 3-1.5 3-3.5 0-2-1.5-3.5-1.5-3.5V9a7 7 0 0 0-7-7z"/></svg>
@@ -19,6 +20,7 @@
     <div class="footer-quote">Cease to struggle and you cease to live</div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/common.js"></script>
 <script>
     /* ---- 导航滑动高亮条 ---- */
     (function() {

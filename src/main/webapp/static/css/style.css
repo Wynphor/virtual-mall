@@ -1410,6 +1410,13 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 12px;
 }
 
+.footer-signature {
+    font-size: 0.8rem;
+    color: #4b5563;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
 .footer-social {
     display: flex;
     justify-content: center;
