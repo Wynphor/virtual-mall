@@ -1,562 +1,288 @@
-﻿CREATE DATABASE IF NOT EXISTS virtual_mall DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE virtual_mall;
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+--
+-- Host: localhost    Database: virtual_mall
+-- ------------------------------------------------------
+-- Server version	8.0.42
 
--- ============================
--- 建表
--- ============================
-CREATE TABLE IF NOT EXISTS `user` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `username` VARCHAR(50) NOT NULL UNIQUE,
-    `password` VARCHAR(100) NOT NULL,
-    `email` VARCHAR(100) DEFAULT NULL,
-    `phone` VARCHAR(20) DEFAULT NULL,
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `status` TINYINT DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE TABLE IF NOT EXISTS `admin` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `username` VARCHAR(50) NOT NULL UNIQUE,
-    `password` VARCHAR(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- Current Database: `virtual_mall`
+--
 
-CREATE TABLE IF NOT EXISTS `category` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `name` VARCHAR(100) NOT NULL,
-    `parent_id` INT DEFAULT 0,
-    `sort_order` INT DEFAULT 0,
-    `status` TINYINT DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40000 DROP DATABASE IF EXISTS `virtual_mall`*/;
 
-CREATE TABLE IF NOT EXISTS `product` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `name` VARCHAR(200) NOT NULL,
-    `category_id` INT NOT NULL,
-    `description` TEXT,
-    `image` VARCHAR(255) DEFAULT NULL,
-    `price` DECIMAL(10,2) NOT NULL,
-    `sales` INT DEFAULT 0,
-    `status` TINYINT DEFAULT 1,
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_category (`category_id`),
-    INDEX idx_status (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `virtual_mall` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
-CREATE TABLE IF NOT EXISTS `product_sku` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `product_id` INT NOT NULL,
-    `spec_name` VARCHAR(100) NOT NULL,
-    `price` DECIMAL(10,2) NOT NULL,
-    `stock` INT DEFAULT 0,
-    `status` TINYINT DEFAULT 1,
-    INDEX idx_product (`product_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+USE `virtual_mall`;
 
-CREATE TABLE IF NOT EXISTS `mall_order` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `order_no` VARCHAR(32) NOT NULL UNIQUE,
-    `user_id` INT DEFAULT NULL,
-    `contact` VARCHAR(100) NOT NULL,
-    `query_password` VARCHAR(100) DEFAULT NULL,
-    `pay_method` VARCHAR(20) DEFAULT NULL,
-    `total_price` DECIMAL(10,2) NOT NULL,
-    `status` TINYINT DEFAULT 0,
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `pay_time` DATETIME DEFAULT NULL,
-    INDEX idx_user (`user_id`),
-    INDEX idx_contact (`contact`),
-    INDEX idx_status (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- Table structure for table `admin`
+--
 
-CREATE TABLE IF NOT EXISTS `order_item` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `order_id` INT NOT NULL,
-    `product_id` INT NOT NULL,
-    `sku_id` INT NOT NULL,
-    `product_name` VARCHAR(200) NOT NULL,
-    `spec_name` VARCHAR(100) NOT NULL,
-    `price` DECIMAL(10,2) NOT NULL,
-    `quantity` INT NOT NULL,
-    INDEX idx_order (`order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+DROP TABLE IF EXISTS `admin`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `admin` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS `card_key` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `sku_id` INT NOT NULL,
-    `content` TEXT NOT NULL,
-    `status` TINYINT DEFAULT 0,
-    `order_item_id` INT DEFAULT NULL,
-    `add_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `sell_time` DATETIME DEFAULT NULL,
-    INDEX idx_sku (`sku_id`),
-    INDEX idx_status (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- Dumping data for table `admin`
+--
 
--- ============================
--- 管理员 & 用户
--- ============================
-INSERT INTO `admin` (`username`, `password`) VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e');
-INSERT INTO `user` (`username`, `password`, `email`, `phone`) VALUES
-('testuser',   'e10adc3949ba59abbe56e057f20f883e', 'test@example.com',        '13800138000'),
-('挽枫',       '6b8bde7d2a96c47cc8d26f363a63c9e4', 'maple_leaf@qq.com',       '13900139001'),
-('薛梦凝',     '13b94bf5f44e1b204f0183f1b03aaba7', 'frost_dream@163.com',     '15800158002'),
-('郑小rua',    '6bd9bd66cbc7bce35a0a61bae592795a', 'rua_cute@gmail.com',     '17700177003'),
-('Wind',       'c6441e15f38cd5b6b39a9481d30ba727', 'breeze@outlook.com',     '18600186004'),
-('xiaohong',   'efc064d0e61259bf69583f6e97708aa2', 'xiaohong@outlook.com',    NULL);
+LOCK TABLES `admin` WRITE;
+/*!40000 ALTER TABLE `admin` DISABLE KEYS */;
+INSERT INTO `admin` VALUES (1,'admin','e10adc3949ba59abbe56e057f20f883e');
+/*!40000 ALTER TABLE `admin` ENABLE KEYS */;
+UNLOCK TABLES;
 
--- ============================
--- 一级分类（6大类）
--- ============================
-INSERT INTO `category` (`id`, `name`, `parent_id`, `sort_order`) VALUES
-(1, 'AI服务与账号',  0, 1),
-(2, 'API与网络',     0, 2),
-(3, '账号与会员',    0, 3),
-(4, '课设与毕设',    0, 4),
-(5, '知识付费',      0, 5),
-(6, '工具与充值',    0, 6);
+--
+-- Table structure for table `card_key`
+--
 
--- ============================
--- 二级分类（18个）
--- ============================
-INSERT INTO `category` (`id`, `name`, `parent_id`, `sort_order`) VALUES
--- AI服务与账号
-(101, 'ChatGPT / Claude',   1, 1),
-(102, '国产AI / 其他AI',    1, 2),
-(103, 'AI绘画 / 音乐 / 视频', 1, 3),
-(104, 'AI编程助手',          1, 4),
--- API与网络
-(201, 'API中转额度',         2, 1),
-(202, 'SDK充值卡',           2, 2),
-(203, '机场 / 加速器',       2, 3),
--- 账号与会员
-(301, '邮箱 / Apple ID',     3, 1),
-(302, '社交平台账号',        3, 2),
-(303, '流媒体会员',          3, 3),
-(304, '游戏平台',            3, 4),
-(305, '办公与开发工具',      3, 5),
--- 课设与毕设
-(401, 'SSM / SpringBoot 项目', 4, 1),
-(402, 'Python / 前端 / 小程序', 4, 2),
-(403, '比赛项目 / 大作业',   4, 3),
--- 知识付费
-(501, 'AI编程工具教程',      5, 1),
-(502, 'Skills / Prompt / 课程', 5, 2),
--- 工具与充值
-(601, '一键部署包',          6, 1),
-(602, '注册机 / 0刀卡 / 脚本', 6, 2),
-(603, '区块链 / 虚拟币',     6, 3);
+DROP TABLE IF EXISTS `card_key`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `card_key` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sku_id` int NOT NULL,
+  `content` text NOT NULL,
+  `status` tinyint DEFAULT '0',
+  `order_item_id` int DEFAULT NULL,
+  `add_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `sell_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_sku` (`sku_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=413 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- ============================
--- 商品（64个）
--- ============================
-INSERT INTO `product` (`id`, `name`, `category_id`, `description`, `price`, `sales`, `status`) VALUES
+--
+-- Dumping data for table `card_key`
+--
 
--- ========== 1. AI服务与账号 ==========
-(1, 'ChatGPT Free 成品号', 101,
-     'OpenAI注册完成的成品账号，已过邮箱验证，可直接登录使用免费版GPT-3.5。日抛/月抛可选，适合批量使用或临时需求。',
-     0.50, 15200, 1),
-(2, 'ChatGPT Plus 成品号', 101,
-     '已订阅Plus的ChatGPT成品号，支持GPT-4o、GPT-4、DALL·E、高级数据分析、联网搜索。日抛/月抛/季卡/年卡，土区/阿区低价开通。',
-     8.00, 12800, 1),
-(3, 'ChatGPT Pro 成品号', 101,
-     '已订阅Pro的ChatGPT成品号，支持o1/o1-mini/o3/o4-mini等推理模型，无限制GPT-4o。月抛/季卡可选。',
-     188.00, 3600, 1),
-(4, 'Claude Free 成品号', 101,
-     'Anthropic注册完成的Claude成品号，支持Claude 3.5 Haiku免费使用。日抛/月抛可选。',
-     1.00, 8200, 1),
-(5, 'Claude Pro 成品号', 101,
-     '已订阅Pro的Claude成品号，支持Claude 3.5 Sonnet/Opus，5倍用量，200K上下文。月抛/季卡/年卡可选。',
-     88.00, 5600, 1),
-(6, 'Claude Max 成品号', 101,
-     '已订阅Max的Claude成品号，全部模型最高用量。月抛/季卡可选。',
-     288.00, 1200, 1),
-(7, 'DeepSeek 成品号', 102,
-     'DeepSeek深度求索成品号，支持V3/Chat/R1推理模型。国产之光，中文能力极强。日抛/月抛可选。',
-     2.00, 9800, 1),
-(8, 'Kimi (月之暗面) 成品号', 102,
-     'Kimi智能助手成品号，支持200万字长上下文、联网搜索、文件分析。日抛/月抛可选。',
-     3.00, 6400, 1),
-(9, 'Gemini Advanced 成品号', 102,
-     'Google Gemini Advanced成品号，支持Gemini 2.5 Pro/Flash，200万上下文。月抛/季卡可选。',
-     18.00, 2800, 1),
-(10, 'Midjourney 成品号', 103,
-     'Midjourney成品号，支持V6.1模型、图生图、风格混合。AI绘画领域天花板。',
-     35.00, 3200, 1),
-(11, 'Stable Diffusion 云端部署', 103,
-     'SD WebUI云端部署账号，预装SDXL/Flux模型。开箱即用，无需本地GPU。',
-     15.00, 2400, 1),
-(12, 'Suno AI 音乐生成', 103,
-     'Suno AI音乐生成成品号，V4模型，每天50首完整歌曲。月抛/年卡可选。',
-     18.00, 1800, 1),
-(13, 'Runway Gen-3 视频生成', 103,
-     'Runway Gen-3 Alpha视频生成成品号，文字转视频、图片转视频。',
-     35.00, 1200, 1),
-(14, 'Cursor Pro 成品号', 104,
-     'Cursor Pro AI IDE成品号，GPT-4/Claude驱动代码补全、Composer多文件编辑。月抛/年卡可选。',
-     28.00, 4800, 1),
-(15, 'Windsurf Pro 成品号', 104,
-     'Windsurf Pro成品号，Cascade多步骤Agent编程、全仓库理解。月抛可选。',
-     22.00, 2600, 1),
+LOCK TABLES `card_key` WRITE;
+/*!40000 ALTER TABLE `card_key` DISABLE KEYS */;
+INSERT INTO `card_key` VALUES (112,1,'account:gpt-free-001@outlook.com | password:Gp@2026fR1e',0,NULL,'2026-06-06 10:23:43',NULL),(113,1,'account:gpt-free-002@outlook.com | password:Gp@2026eE3d',0,NULL,'2026-06-06 10:23:43',NULL),(115,4,'account:gpt-plus-tr-001@outlook.com | password:Pl@2026tR7k | region:TR',1,1,'2026-06-06 10:23:43',NULL),(116,4,'account:gpt-plus-tr-002@outlook.com | password:Pl@2026tR9m | region:TR',0,NULL,'2026-06-06 10:23:43',NULL),(117,9,'account:gpt-pro-001@proton.me | password:Pr@2026oR1x | plan:pro | region:TR',0,NULL,'2026-06-06 10:23:43',NULL),(118,9,'account:gpt-pro-002@proton.me | password:Pr@2026oR3z | plan:pro | region:TR',0,NULL,'2026-06-06 10:23:43',NULL),(119,13,'account:claude-pro-001@outlook.com | password:Cl@2026pR1o | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(120,13,'account:claude-pro-002@outlook.com | password:Cl@2026pR3p | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(121,21,'account:kimi-001@qq.com | password:Ki@2026mI1a',0,NULL,'2026-06-06 10:23:43',NULL),(122,21,'account:kimi-002@qq.com | password:Ki@2026mI3c',0,NULL,'2026-06-06 10:23:43',NULL),(123,25,'account:mj-basic-001@gmail.com | password:Mj@2026bS1k | plan:basic',0,NULL,'2026-06-06 10:23:43',NULL),(124,25,'account:mj-basic-002@gmail.com | password:Mj@2026bS3m | plan:basic',0,NULL,'2026-06-06 10:23:43',NULL),(125,22,'account:kimi-sold-001@qq.com | password:Ki@2026sO1l',1,2,'2026-06-06 10:23:43',NULL),(126,30,'account:suno-pro-001@outlook.com | password:Su@2026pR1n | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(127,30,'account:suno-pro-002@outlook.com | password:Su@2026pR3q | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(128,34,'account:cursor-pro-001@gmail.com | password:Cu@2026pR1o | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(129,34,'account:cursor-pro-002@gmail.com | password:Cu@2026pR3s | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(130,27,'account:mj-pro-sold-001@gmail.com | password:Mj@2026sO1l | plan:pro',1,3,'2026-06-06 10:23:43',NULL),(131,38,'api-key:demo-key-proj-2026xK9mN2pQrS4tU6vW | balance:10CNY',0,NULL,'2026-06-06 10:23:43',NULL),(132,38,'api-key:demo-key-proj-2026aB3cD5eF7gH9iJ1k | balance:10CNY',0,NULL,'2026-06-06 10:23:43',NULL),(133,42,'api-key:demo-key-ant-2026xK9mN2pQrS4tU6vW | balance:10CNY',0,NULL,'2026-06-06 10:23:43',NULL),(134,42,'api-key:demo-key-ant-2026aB3cD5eF7gH9iJ1k | balance:10CNY',0,NULL,'2026-06-06 10:23:43',NULL),(135,54,'subscribe-url:https://sub.example.com/link/abc123 | traffic:100GB | expire:30days',0,NULL,'2026-06-06 10:23:43',NULL),(136,54,'subscribe-url:https://sub.example.com/link/def456 | traffic:100GB | expire:30days',0,NULL,'2026-06-06 10:23:43',NULL),(137,60,'traffic-add:https://sub.example.com/link/gh789 | add:100GB',0,NULL,'2026-06-06 10:23:43',NULL),(138,60,'traffic-add:https://sub.example.com/link/jk012 | add:100GB',0,NULL,'2026-06-06 10:23:43',NULL),(139,65,'account:gmail-001@gmail.com | password:Gm@2026aC1b | recovery:已设置 | phone:已绑定',1,9,'2026-06-06 10:23:43','2026-06-06 17:12:19'),(140,65,'account:gmail-002@gmail.com | password:Gm@2026cD3e | recovery:已设置 | phone:已绑定',0,NULL,'2026-06-06 10:23:43',NULL),(141,71,'account:proton-001@proton.me | password:Pm@2026eN1c | recovery:已设置',0,NULL,'2026-06-06 10:23:43',NULL),(142,71,'account:proton-002@proton.me | password:Pm@2026gH3f | recovery:已设置',0,NULL,'2026-06-06 10:23:43',NULL),(143,73,'account:appleid-001@icloud.com | password:Ap@2026iD1h | region:HK | phone:已绑定',0,NULL,'2026-06-06 10:23:43',NULL),(144,73,'account:appleid-002@icloud.com | password:Ap@2026iD3j | region:HK | phone:已绑定',0,NULL,'2026-06-06 10:23:43',NULL),(145,77,'account:tw-001@outlook.com | password:Tw@2026nE1a | followers:0 | verified:email',0,NULL,'2026-06-06 10:23:43',NULL),(146,77,'account:tw-002@outlook.com | password:Tw@2026nE3c | followers:0 | verified:email',0,NULL,'2026-06-06 10:23:43',NULL),(147,80,'account:+8613800139001 | code:TG-2026-A1B2C3 | phone:verified',0,NULL,'2026-06-06 10:23:43',NULL),(148,80,'account:+8613800139002 | code:TG-2026-D4E5F6 | phone:verified',0,NULL,'2026-06-06 10:23:43',NULL),(149,83,'account:nf-premium-001@gmail.com | password:Nf@2026pM1x | plan:premium | region:TR | 4K:yes',0,NULL,'2026-06-06 10:23:43',NULL),(150,83,'account:nf-premium-002@gmail.com | password:Nf@2026pM3z | plan:premium | region:TR | 4K:yes',0,NULL,'2026-06-06 10:23:43',NULL),(151,85,'account:yt-premium-001@gmail.com | password:Yt@2026pR1o | plan:personal | region:TR',0,NULL,'2026-06-06 10:23:43',NULL),(152,85,'account:yt-premium-002@gmail.com | password:Yt@2026pR3s | plan:personal | region:TR',0,NULL,'2026-06-06 10:23:43',NULL),(153,88,'account:spotify-001@gmail.com | password:Sp@2026pR1n | plan:personal | region:TR',0,NULL,'2026-06-06 10:23:43',NULL),(154,88,'account:spotify-002@gmail.com | password:Sp@2026pR3q | plan:personal | region:TR',0,NULL,'2026-06-06 10:23:43',NULL),(155,91,'STEAM-WALLET-2026-XK9M-NP4R-S6TU-W8VX | balance:50CNY',0,NULL,'2026-06-06 10:23:43',NULL),(156,91,'STEAM-WALLET-2026-AB3C-D5EF-G7HI-J1KL | balance:50CNY',0,NULL,'2026-06-06 10:23:43',NULL),(157,94,'XBOX-GPU-2026-M9N2-P4R6-T8U1-V3W5 | plan:ultimate | months:1',0,NULL,'2026-06-06 10:23:43',NULL),(158,94,'XBOX-GPU-2026-X7K8-L2M3-N5P4-Q6R7 | plan:ultimate | months:1',0,NULL,'2026-06-06 10:23:43',NULL),(159,97,'M365-PERSONAL-2026-KX9M-2NP4-RS4T-U6VW | plan:personal | months:12',0,NULL,'2026-06-06 10:23:43',NULL),(160,97,'M365-PERSONAL-2026-AB3C-5D7E-F9G1-H3I5 | plan:personal | months:12',0,NULL,'2026-06-06 10:23:43',NULL),(161,99,'JET-2026-XK9M-NP4R-S6TU-W8VX-Y1ZA-B3CD | product:all | months:12',0,NULL,'2026-06-06 10:23:43',NULL),(162,99,'JET-2026-EF7G-H9IJ-K1LM-N3OP-Q5RS-T7UV | product:all | months:12',0,NULL,'2026-06-06 10:23:43',NULL),(163,101,'ADOBE-CC-2026-001@creative.cloud | license:full | months:1',0,NULL,'2026-06-06 10:23:43',NULL),(164,101,'ADOBE-CC-2026-002@creative.cloud | license:full | months:1',0,NULL,'2026-06-06 10:23:43',NULL),(165,104,'account:gh-pro-001@outlook.com | password:Gh@2026pR1o | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(166,104,'account:gh-pro-002@outlook.com | password:Gh@2026pR3s | plan:pro',0,NULL,'2026-06-06 10:23:43',NULL),(167,110,'download:https://pan.example.com/s/ssm-mall | code:km9n | readme:included',0,NULL,'2026-06-06 10:23:43',NULL),(168,110,'download:https://pan.example.com/s/ssm-mall-02 | code:pq3r | readme:included',0,NULL,'2026-06-06 10:23:43',NULL),(169,114,'download:https://pan.example.com/s/sb-blog | code:xk9m | readme:included',0,NULL,'2026-06-06 10:23:43',NULL),(170,114,'download:https://pan.example.com/s/sb-blog-02 | code:ab3c | readme:included',0,NULL,'2026-06-06 10:23:43',NULL),(171,120,'download:https://pan.example.com/s/flask-blog | code:ef7g | readme:included',0,NULL,'2026-06-06 10:23:43',NULL),(172,141,'download:https://pan.example.com/s/skills-500 | code:hj1k | format:md+txt',0,NULL,'2026-06-06 10:23:43',NULL),(173,145,'download:https://pan.example.com/s/ai-guide | code:mn2p | format:pdf',0,NULL,'2026-06-06 10:23:43',NULL),(174,151,'download:https://pan.example.com/s/lobechat-docker | code:qr4s | readme:included',0,NULL,'2026-06-06 10:23:43',NULL),(175,154,'license:REG-2026-XK9M-NP4R-S6TU | type:permanent | limit:unlimited',0,NULL,'2026-06-06 10:23:43',NULL),(176,155,'card-number:4532-XXXX-XXXX-7890 | cvv:123 | exp:12/28 | balance:$0 | region:US',0,NULL,'2026-06-06 10:23:43',NULL),(177,155,'card-number:4532-XXXX-XXXX-3456 | cvv:456 | exp:03/29 | balance:$0 | region:US',0,NULL,'2026-06-06 10:23:43',NULL),(178,165,'REF-2026-BINANCE-XK9M2N | rebate:20% | type:spot+future',2,NULL,'2026-06-06 10:23:43',NULL),(179,165,'REF-2026-BINANCE-AB3C5D | rebate:20% | type:spot+future',2,NULL,'2026-06-06 10:23:43',NULL),(180,160,'wallet:TRC20-TXhash2026xK9mN2pQ | amount:10USDT | chain:TRC20',0,NULL,'2026-06-06 10:23:43',NULL),(181,134,'download:https://pan.example.com/s/claude-code-basic | code:cd12 | format:pdf+code',0,NULL,'2026-06-06 10:23:43',NULL),(182,9,'account:claude-pro-sold-001@proton.me | password:Cp@2026sO1l | plan:pro',1,4,'2026-06-06 10:23:43',NULL),(183,2,'account:gpt-free-m01@outlook.com | password:Gf@2026m01a',2,NULL,'2026-06-06 10:28:45',NULL),(184,2,'account:gpt-free-m02@outlook.com | password:Gf@2026m02b',0,NULL,'2026-06-06 10:28:45',NULL),(185,3,'account:gpt-free-p01@gmail.com | password:Gp@2026p01x',0,NULL,'2026-06-06 10:28:45',NULL),(186,3,'account:gpt-free-p02@gmail.com | password:Gp@2026p02y',0,NULL,'2026-06-06 10:28:45',NULL),(187,3,'account:gpt-free-p03@gmail.com | password:Gp@2026p03z',0,NULL,'2026-06-06 10:28:45',NULL),(188,3,'account:gpt-free-p04@gmail.com | password:Gp@2026p04a',0,NULL,'2026-06-06 10:28:45',NULL),(189,3,'account:gpt-free-p05@gmail.com | password:Gp@2026p05b',0,NULL,'2026-06-06 10:28:45',NULL),(190,5,'account:gpt-plus-mtr01@outlook.com | password:Pt@2026m01 | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(191,5,'account:gpt-plus-mtr02@outlook.com | password:Pt@2026m02 | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(192,6,'account:gpt-plus-mar01@outlook.com | password:Pa@2026m01 | region:AR',0,NULL,'2026-06-06 10:28:45',NULL),(193,6,'account:gpt-plus-mar02@outlook.com | password:Pa@2026m02 | region:AR',0,NULL,'2026-06-06 10:28:45',NULL),(194,7,'account:gpt-plus-q01@proton.me | password:Pq@2026q01 | plan:quarterly | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(195,7,'account:gpt-plus-q02@proton.me | password:Pq@2026q02 | plan:quarterly | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(196,8,'account:gpt-plus-y01@proton.me | password:Py@2026y01 | plan:yearly | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(197,8,'account:gpt-plus-y02@proton.me | password:Py@2026y02 | plan:yearly | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(198,10,'account:gpt-pro-q01@proton.me | password:Pq@2026q01x | plan:pro | plan:quarterly',0,NULL,'2026-06-06 10:28:45',NULL),(199,10,'account:gpt-pro-q02@proton.me | password:Pq@2026q02y | plan:pro | plan:quarterly',0,NULL,'2026-06-06 10:28:45',NULL),(200,11,'account:claude-free-d01@outlook.com | password:Cf@2026d01',0,NULL,'2026-06-06 10:28:45',NULL),(201,11,'account:claude-free-d02@outlook.com | password:Cf@2026d02',0,NULL,'2026-06-06 10:28:45',NULL),(202,12,'account:claude-free-m01@gmail.com | password:Cm@2026m01',0,NULL,'2026-06-06 10:28:45',NULL),(203,12,'account:claude-free-m02@gmail.com | password:Cm@2026m02',0,NULL,'2026-06-06 10:28:45',NULL),(204,14,'account:claude-pro-q01@outlook.com | password:Cp@2026q01 | plan:pro | plan:quarterly',0,NULL,'2026-06-06 10:28:45',NULL),(205,14,'account:claude-pro-q02@outlook.com | password:Cp@2026q02 | plan:pro | plan:quarterly',0,NULL,'2026-06-06 10:28:45',NULL),(206,15,'account:claude-pro-y01@gmail.com | password:Cy@2026y01 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(207,15,'account:claude-pro-y02@gmail.com | password:Cy@2026y02 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(208,16,'account:claude-max-m01@proton.me | password:Cx@2026m01 | plan:max',0,NULL,'2026-06-06 10:28:45',NULL),(209,16,'account:claude-max-m02@proton.me | password:Cx@2026m02 | plan:max',0,NULL,'2026-06-06 10:28:45',NULL),(210,17,'account:claude-max-q01@proton.me | password:Cx@2026q01 | plan:max | plan:quarterly',0,NULL,'2026-06-06 10:28:45',NULL),(211,17,'account:claude-max-q02@proton.me | password:Cx@2026q02 | plan:max | plan:quarterly',0,NULL,'2026-06-06 10:28:45',NULL),(212,18,'account:deepseek-d01@qq.com | password:Ds@2026d01',0,NULL,'2026-06-06 10:28:45',NULL),(213,18,'account:deepseek-d02@qq.com | password:Ds@2026d02',0,NULL,'2026-06-06 10:28:45',NULL),(214,19,'account:deepseek-m01@gmail.com | password:Dm@2026m01',0,NULL,'2026-06-06 10:28:45',NULL),(215,19,'account:deepseek-m02@gmail.com | password:Dm@2026m02',0,NULL,'2026-06-06 10:28:45',NULL),(216,20,'account:deepseek-p01@outlook.com | password:Dp@2026p01',0,NULL,'2026-06-06 10:28:45',NULL),(217,20,'account:deepseek-p02@outlook.com | password:Dp@2026p02',0,NULL,'2026-06-06 10:28:45',NULL),(218,20,'account:deepseek-p03@outlook.com | password:Dp@2026p03',0,NULL,'2026-06-06 10:28:45',NULL),(219,22,'account:kimi-m01@qq.com | password:Km@2026m01',0,NULL,'2026-06-06 10:28:45',NULL),(220,22,'account:kimi-m02@qq.com | password:Km@2026m02',0,NULL,'2026-06-06 10:28:45',NULL),(221,23,'account:gemini-m01@gmail.com | password:Gm@2026m01 | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(222,23,'account:gemini-m02@gmail.com | password:Gm@2026m02 | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(223,24,'account:gemini-q01@gmail.com | password:Gq@2026q01 | plan:quarterly | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(224,24,'account:gemini-q02@gmail.com | password:Gq@2026q02 | plan:quarterly | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(225,26,'account:mj-standard-001@gmail.com | password:Mj@2026s01 | plan:standard',0,NULL,'2026-06-06 10:28:45',NULL),(226,26,'account:mj-standard-002@gmail.com | password:Mj@2026s02 | plan:standard',0,NULL,'2026-06-06 10:28:45',NULL),(227,27,'account:mj-pro-001@gmail.com | password:Mj@2026p01 | plan:pro',0,NULL,'2026-06-06 10:28:45',NULL),(228,27,'account:mj-pro-002@gmail.com | password:Mj@2026p02 | plan:pro',0,NULL,'2026-06-06 10:28:45',NULL),(229,28,'account:sd-basic-001@outlook.com | password:Sd@2026b01 | gpu:basic',0,NULL,'2026-06-06 10:28:45',NULL),(230,28,'account:sd-basic-002@outlook.com | password:Sd@2026b02 | gpu:basic',0,NULL,'2026-06-06 10:28:45',NULL),(231,29,'account:sd-advanced-001@gmail.com | password:Sd@2026a01 | gpu:advanced',0,NULL,'2026-06-06 10:28:45',NULL),(232,29,'account:sd-advanced-002@gmail.com | password:Sd@2026a02 | gpu:advanced',0,NULL,'2026-06-06 10:28:45',NULL),(233,31,'account:suno-pro-y01@outlook.com | password:Sy@2026y01 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(234,31,'account:suno-pro-y02@outlook.com | password:Sy@2026y02 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(235,32,'account:runway-std-001@gmail.com | password:Rw@2026s01 | plan:standard',0,NULL,'2026-06-06 10:28:45',NULL),(236,32,'account:runway-std-002@gmail.com | password:Rw@2026s02 | plan:standard',0,NULL,'2026-06-06 10:28:45',NULL),(237,33,'account:runway-pro-001@gmail.com | password:Rw@2026p01 | plan:pro',0,NULL,'2026-06-06 10:28:45',NULL),(238,33,'account:runway-pro-002@gmail.com | password:Rw@2026p02 | plan:pro',0,NULL,'2026-06-06 10:28:45',NULL),(239,35,'account:cursor-y01@gmail.com | password:Cu@2026y01 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(240,35,'account:cursor-y02@gmail.com | password:Cu@2026y02 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(241,36,'account:windsurf-m01@outlook.com | password:Wf@2026m01 | plan:pro',0,NULL,'2026-06-06 10:28:45',NULL),(242,36,'account:windsurf-m02@outlook.com | password:Wf@2026m02 | plan:pro',0,NULL,'2026-06-06 10:28:45',NULL),(243,37,'account:windsurf-y01@gmail.com | password:Wy@2026y01 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(244,37,'account:windsurf-y02@gmail.com | password:Wy@2026y02 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(245,39,'api-key:demo-key-proj-2026mN2pQrS4tU6vWxK9 | balance:50CNY',0,NULL,'2026-06-06 10:28:45',NULL),(246,39,'api-key:demo-key-proj-2026aB3cD5eF7gH9iJ1 | balance:50CNY',0,NULL,'2026-06-06 10:28:45',NULL),(247,40,'api-key:demo-key-proj-2026pQrS4tU6vWxK9mN | balance:100CNY',0,NULL,'2026-06-06 10:28:45',NULL),(248,40,'api-key:demo-key-proj-2026cD5eF7gH9iJ1kL2 | balance:100CNY',0,NULL,'2026-06-06 10:28:45',NULL),(249,41,'api-key:demo-key-proj-2026tU6vWxK9mN2pQrS | balance:500CNY',0,NULL,'2026-06-06 10:28:45',NULL),(250,41,'api-key:demo-key-proj-2026eF7gH9iJ1kL2mN3 | balance:500CNY',0,NULL,'2026-06-06 10:28:45',NULL),(251,43,'api-key:demo-key-ant-2026mN2pQrS4tU6vWxK9 | balance:50CNY',0,NULL,'2026-06-06 10:28:45',NULL),(252,43,'api-key:demo-key-ant-2026aB3cD5eF7gH9iJ1 | balance:50CNY',0,NULL,'2026-06-06 10:28:45',NULL),(253,44,'api-key:demo-key-ant-2026pQrS4tU6vWxK9mN | balance:100CNY',0,NULL,'2026-06-06 10:28:45',NULL),(254,44,'api-key:demo-key-ant-2026cD5eF7gH9iJ1kL2 | balance:100CNY',0,NULL,'2026-06-06 10:28:45',NULL),(255,45,'api-key:ds-2026mN2pQrS4tU6vWxK9 | balance:10CNY',0,NULL,'2026-06-06 10:28:45',NULL),(256,45,'api-key:ds-2026aB3cD5eF7gH9iJ1 | balance:10CNY',0,NULL,'2026-06-06 10:28:45',NULL),(257,46,'api-key:ds-2026pQrS4tU6vWxK9mN | balance:50CNY',0,NULL,'2026-06-06 10:28:45',NULL),(258,46,'api-key:ds-2026cD5eF7gH9iJ1kL2 | balance:50CNY',0,NULL,'2026-06-06 10:28:45',NULL),(259,47,'GIFT-OPENAI-2026-XK9M-NP4R-S6TU-V8WX | value:$5',0,NULL,'2026-06-06 10:28:45',NULL),(260,47,'GIFT-OPENAI-2026-AB3C-D5EF-G7HI-J1KL | value:$5',0,NULL,'2026-06-06 10:28:45',NULL),(261,48,'GIFT-OPENAI-2026-M9N2-P4R6-T8U1-V3W5 | value:$10',0,NULL,'2026-06-06 10:28:45',NULL),(262,48,'GIFT-OPENAI-2026-X7K8-L2M3-N5P4-Q6R7 | value:$10',0,NULL,'2026-06-06 10:28:45',NULL),(263,49,'GIFT-OPENAI-2026-EF7G-H9IJ-K1LM-N3OP | value:$50',0,NULL,'2026-06-06 10:28:45',NULL),(264,49,'GIFT-OPENAI-2026-Q5RS-T7UV-W1XY-Z3AB | value:$50',0,NULL,'2026-06-06 10:28:45',NULL),(265,50,'GIFT-OPENAI-2026-C4DE-F5GH-I6JK-L7MN | value:$100',0,NULL,'2026-06-06 10:28:45',NULL),(266,50,'GIFT-OPENAI-2026-O8PQ-R9ST-U0VW-X1YZ | value:$100',0,NULL,'2026-06-06 10:28:45',NULL),(267,51,'GIFT-ANTHROPIC-2026-XK9M-NP4R-S6TU | value:$5',0,NULL,'2026-06-06 10:28:45',NULL),(268,51,'GIFT-ANTHROPIC-2026-AB3C-D5EF-G7HI | value:$5',0,NULL,'2026-06-06 10:28:45',NULL),(269,52,'GIFT-ANTHROPIC-2026-M9N2-P4R6-T8U1 | value:$10',0,NULL,'2026-06-06 10:28:45',NULL),(270,52,'GIFT-ANTHROPIC-2026-X7K8-L2M3-N5P4 | value:$10',0,NULL,'2026-06-06 10:28:45',NULL),(271,53,'GIFT-ANTHROPIC-2026-EF7G-H9IJ-K1LM | value:$50',0,NULL,'2026-06-06 10:28:45',NULL),(272,53,'GIFT-ANTHROPIC-2026-Q5RS-T7UV-W1XY | value:$50',0,NULL,'2026-06-06 10:28:45',NULL),(273,55,'subscribe-url:https://sub.example.com/link/m300a | traffic:300GB | expire:30days',0,NULL,'2026-06-06 10:28:45',NULL),(274,55,'subscribe-url:https://sub.example.com/link/m300b | traffic:300GB | expire:30days',0,NULL,'2026-06-06 10:28:45',NULL),(275,56,'subscribe-url:https://sub.example.com/link/u001a | traffic:unlimited | expire:30days',0,NULL,'2026-06-06 10:28:45',NULL),(276,56,'subscribe-url:https://sub.example.com/link/u001b | traffic:unlimited | expire:30days',0,NULL,'2026-06-06 10:28:45',NULL),(277,57,'subscribe-url:https://sub.example.com/link/y100a | traffic:100GB | expire:365days',0,NULL,'2026-06-06 10:28:45',NULL),(278,57,'subscribe-url:https://sub.example.com/link/y100b | traffic:100GB | expire:365days',0,NULL,'2026-06-06 10:28:45',NULL),(279,58,'subscribe-url:https://sub.example.com/link/y300a | traffic:300GB | expire:365days',0,NULL,'2026-06-06 10:28:45',NULL),(280,58,'subscribe-url:https://sub.example.com/link/y300b | traffic:300GB | expire:365days',0,NULL,'2026-06-06 10:28:45',NULL),(281,59,'subscribe-url:https://sub.example.com/link/yu01a | traffic:unlimited | expire:365days',0,NULL,'2026-06-06 10:28:45',NULL),(282,59,'subscribe-url:https://sub.example.com/link/yu01b | traffic:unlimited | expire:365days',0,NULL,'2026-06-06 10:28:45',NULL),(283,61,'traffic-add:https://sub.example.com/link/t500a | add:500GB',0,NULL,'2026-06-06 10:28:45',NULL),(284,61,'traffic-add:https://sub.example.com/link/t500b | add:500GB',0,NULL,'2026-06-06 10:28:45',NULL),(285,62,'account:accel-m01@qq.com | password:Ac@2026m01 | brand:UU | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(286,62,'account:accel-m02@qq.com | password:Ac@2026m02 | brand:迅游 | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(287,63,'account:accel-q01@qq.com | password:Ac@2026q01 | brand:UU | months:3',0,NULL,'2026-06-06 10:28:45',NULL),(288,63,'account:accel-q02@qq.com | password:Ac@2026q02 | brand:雷神 | months:3',0,NULL,'2026-06-06 10:28:45',NULL),(289,64,'account:accel-y01@qq.com | password:Ac@2026y01 | brand:UU | months:12',0,NULL,'2026-06-06 10:28:45',NULL),(290,64,'account:accel-y02@qq.com | password:Ac@2026y02 | brand:迅游 | months:12',0,NULL,'2026-06-06 10:28:45',NULL),(291,66,'account:gmail-b10-01@gmail.com | password:Gb@202601 | recovery:已设置',0,NULL,'2026-06-06 10:28:45',NULL),(292,66,'account:gmail-b10-02@gmail.com | password:Gb@202602 | recovery:已设置',0,NULL,'2026-06-06 10:28:45',NULL),(293,66,'account:gmail-b10-03@gmail.com | password:Gb@202603 | recovery:已设置',0,NULL,'2026-06-06 10:28:45',NULL),(294,67,'account:gmail-b100-01@gmail.com | password:Gx@202601 | recovery:已设置 | batch:100',0,NULL,'2026-06-06 10:28:45',NULL),(295,67,'account:gmail-b100-02@gmail.com | password:Gx@202602 | recovery:已设置 | batch:100',0,NULL,'2026-06-06 10:28:45',NULL),(296,68,'account:outlook-001@outlook.com | password:Ol@2026001 | recovery:已设置',0,NULL,'2026-06-06 10:28:45',NULL),(297,68,'account:outlook-002@outlook.com | password:Ol@2026002 | recovery:已设置',0,NULL,'2026-06-06 10:28:45',NULL),(298,69,'account:outlook-b10-01@outlook.com | password:Ob@202601',0,NULL,'2026-06-06 10:28:45',NULL),(299,69,'account:outlook-b10-02@outlook.com | password:Ob@202602',0,NULL,'2026-06-06 10:28:45',NULL),(300,70,'account:outlook-b50-01@outlook.com | password:Ox@202601 | batch:50',0,NULL,'2026-06-06 10:28:45',NULL),(301,70,'account:outlook-b50-02@outlook.com | password:Ox@202602 | batch:50',0,NULL,'2026-06-06 10:28:45',NULL),(302,72,'account:proton-b10-01@proton.me | password:Pb@202601',0,NULL,'2026-06-06 10:28:45',NULL),(303,72,'account:proton-b10-02@proton.me | password:Pb@202602',0,NULL,'2026-06-06 10:28:45',NULL),(304,74,'account:appleid-us01@icloud.com | password:Au@202601 | region:US | phone:已绑定',0,NULL,'2026-06-06 10:28:45',NULL),(305,74,'account:appleid-us02@icloud.com | password:Au@202602 | region:US | phone:已绑定',0,NULL,'2026-06-06 10:28:45',NULL),(306,75,'account:appleid-tr01@icloud.com | password:At@202601 | region:TR | phone:已绑定',0,NULL,'2026-06-06 10:28:45',NULL),(307,75,'account:appleid-tr02@icloud.com | password:At@202602 | region:TR | phone:已绑定',0,NULL,'2026-06-06 10:28:45',NULL),(308,76,'account:appleid-jp01@icloud.com | password:Aj@202601 | region:JP | phone:已绑定',0,NULL,'2026-06-06 10:28:45',NULL),(309,76,'account:appleid-jp02@icloud.com | password:Aj@202602 | region:JP | phone:已绑定',0,NULL,'2026-06-06 10:28:45',NULL),(310,78,'account:tw-old-001@outlook.com | password:To@2026001 | followers:150 | verified:email',0,NULL,'2026-06-06 10:28:45',NULL),(311,78,'account:tw-old-002@outlook.com | password:To@2026002 | followers:200 | verified:email',0,NULL,'2026-06-06 10:28:45',NULL),(312,79,'account:tw-b10-01@gmail.com | password:Tb@202601 | followers:0',0,NULL,'2026-06-06 10:28:45',NULL),(313,79,'account:tw-b10-02@gmail.com | password:Tb@202602 | followers:0',0,NULL,'2026-06-06 10:28:45',NULL),(314,81,'account:+8613800139003 | code:TG-2026-P1A2B3 | phone:verified | premium:30days',0,NULL,'2026-06-06 10:28:45',NULL),(315,81,'account:+8613800139004 | code:TG-2026-P4C5D6 | phone:verified | premium:30days',0,NULL,'2026-06-06 10:28:45',NULL),(316,82,'account:nf-standard-001@gmail.com | password:Ns@2026001 | plan:standard | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(317,82,'account:nf-standard-002@gmail.com | password:Ns@2026002 | plan:standard | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(318,84,'account:nf-premium-q01@gmail.com | password:Np@2026q01 | plan:premium | region:TR | 4K:yes',0,NULL,'2026-06-06 10:28:45',NULL),(319,84,'account:nf-premium-q02@gmail.com | password:Np@2026q02 | plan:premium | region:TR | 4K:yes',0,NULL,'2026-06-06 10:28:45',NULL),(320,86,'account:yt-premium-q01@gmail.com | password:Yq@2026q01 | plan:personal | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(321,86,'account:yt-premium-q02@gmail.com | password:Yq@2026q02 | plan:personal | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(322,87,'account:yt-family-001@gmail.com | password:Yf@2026001 | plan:family | members:5 | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(323,87,'account:yt-family-002@gmail.com | password:Yf@2026002 | plan:family | members:5 | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(324,89,'account:spotify-q01@gmail.com | password:Sq@2026q01 | plan:personal | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(325,89,'account:spotify-q02@gmail.com | password:Sq@2026q02 | plan:personal | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(326,90,'account:spotify-y01@gmail.com | password:Sx@2026y01 | plan:personal | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(327,90,'account:spotify-y02@gmail.com | password:Sx@2026y02 | plan:personal | region:TR',0,NULL,'2026-06-06 10:28:45',NULL),(328,92,'STEAM-WALLET-2026-M9N2-P4R6-T8U1-V3W5 | balance:100CNY',0,NULL,'2026-06-06 10:28:45',NULL),(329,92,'STEAM-WALLET-2026-X7K8-L2M3-N5P4-Q6R7 | balance:100CNY',0,NULL,'2026-06-06 10:28:45',NULL),(330,93,'STEAM-WALLET-2026-EF7G-H9IJ-K1LM-N3OP | balance:200CNY',0,NULL,'2026-06-06 10:28:45',NULL),(331,93,'STEAM-WALLET-2026-Q5RS-T7UV-W1XY-Z3AB | balance:200CNY',0,NULL,'2026-06-06 10:28:45',NULL),(332,95,'XBOX-GPU-2026-C4DE-F5GH-I6JK-L7MN | plan:ultimate | months:3',0,NULL,'2026-06-06 10:28:45',NULL),(333,95,'XBOX-GPU-2026-O8PQ-R9ST-U0VW-X1YZ | plan:ultimate | months:3',0,NULL,'2026-06-06 10:28:45',NULL),(334,96,'XBOX-PC-2026-A1B2-C3D4-E5F6-G7H8 | plan:pc | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(335,96,'XBOX-PC-2026-I9J0-K1L2-M3N4-O5P6 | plan:pc | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(336,98,'M365-FAMILY-2026-Q7R8-S9T0-U1V2-W3X4 | plan:family | members:6 | months:12',0,NULL,'2026-06-06 10:28:45',NULL),(337,98,'M365-FAMILY-2026-Y5Z6-A7B8-C9D0-E1F2 | plan:family | members:6 | months:12',0,NULL,'2026-06-06 10:28:45',NULL),(338,100,'JET-PERM-2026-G3H4-I5J6-K7L8-M9N0 | product:all | plan:permanent',0,NULL,'2026-06-06 10:28:45',NULL),(339,100,'JET-PERM-2026-O1P2-Q3R4-S5T6-U7V8 | product:all | plan:permanent',0,NULL,'2026-06-06 10:28:45',NULL),(340,102,'ADOBE-CC-2026-W9X0-Y1Z2-A3B4-C5D6 | license:full | months:12',0,NULL,'2026-06-06 10:28:45',NULL),(341,102,'ADOBE-CC-2026-E7F8-G9H0-I1J2-K3L4 | license:full | months:12',0,NULL,'2026-06-06 10:28:45',NULL),(342,103,'ADOBE-PS-2026-M5N6-O7P8-Q9R0-S1T2 | license:photoshop | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(343,103,'ADOBE-PS-2026-U3V4-W5X6-Y7Z8-A9B0 | license:photoshop | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(344,105,'account:gh-pro-y01@outlook.com | password:Gy@2026y01 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(345,105,'account:gh-pro-y02@outlook.com | password:Gy@2026y02 | plan:pro | plan:yearly',0,NULL,'2026-06-06 10:28:45',NULL),(346,106,'account:icloud-200-01@icloud.com | password:Ic@2026001 | storage:200GB | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(347,106,'account:icloud-200-02@icloud.com | password:Ic@2026002 | storage:200GB | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(348,107,'account:icloud-2tb-01@icloud.com | password:Ix@2026001 | storage:2TB | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(349,107,'account:icloud-2tb-02@icloud.com | password:Ix@2026002 | storage:2TB | months:1',0,NULL,'2026-06-06 10:28:45',NULL),(350,108,'download:https://pan.example.com/s/ssm-library | code:sl01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(351,109,'download:https://pan.example.com/s/ssm-course | code:sc01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(352,111,'download:https://pan.example.com/s/ssm-pet | code:sp01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(353,112,'download:https://pan.example.com/s/ssm-hotel | code:sh01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(354,113,'download:https://pan.example.com/s/ssm-parking | code:sk01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(355,115,'download:https://pan.example.com/s/sb-takeout | code:st01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(356,116,'download:https://pan.example.com/s/sb-exam | code:se01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(357,117,'download:https://pan.example.com/s/sb-forum | code:sf01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(358,118,'download:https://pan.example.com/s/sb-medical | code:sm01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(359,119,'download:https://pan.example.com/s/sb-hr | code:sh02 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(360,121,'download:https://pan.example.com/s/py-django | code:pd01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(361,122,'download:https://pan.example.com/s/py-crawler | code:pc01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(362,123,'download:https://pan.example.com/s/py-chat | code:pf01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(363,124,'download:https://pan.example.com/s/vue3-admin | code:va01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(364,125,'download:https://pan.example.com/s/react-shop | code:rs01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(365,126,'download:https://pan.example.com/s/vue3-portfolio | code:vp01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(366,127,'download:https://pan.example.com/s/mp-trade | code:mt01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(367,128,'download:https://pan.example.com/s/mp-takeout | code:mt02 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(368,129,'download:https://pan.example.com/s/mp-book | code:mb01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(369,130,'download:https://pan.example.com/s/comp-web | code:cw01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(370,131,'download:https://pan.example.com/s/comp-data | code:cd01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(371,132,'download:https://pan.example.com/s/comp-ai | code:ca01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(372,133,'download:https://pan.example.com/s/comp-iot | code:ci01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(373,135,'download:https://pan.example.com/s/claude-code-full | code:cc01 | format:pdf+code+video',0,NULL,'2026-06-06 10:28:45',NULL),(374,136,'download:https://pan.example.com/s/cursor-pdf | code:cp01 | format:pdf',0,NULL,'2026-06-06 10:28:45',NULL),(375,137,'download:https://pan.example.com/s/cursor-full | code:cf01 | format:pdf+video',0,NULL,'2026-06-06 10:28:45',NULL),(376,138,'download:https://pan.example.com/s/copilot-pdf | code:co01 | format:pdf',0,NULL,'2026-06-06 10:28:45',NULL),(377,139,'download:https://pan.example.com/s/copilot-full | code:cf02 | format:pdf+video',0,NULL,'2026-06-06 10:28:45',NULL),(378,140,'download:https://pan.example.com/s/skills-300 | code:sk01 | format:md+txt',0,NULL,'2026-06-06 10:28:45',NULL),(379,142,'download:https://pan.example.com/s/skills-1000 | code:sx01 | format:md+txt',0,NULL,'2026-06-06 10:28:45',NULL),(380,143,'download:https://pan.example.com/s/agent-pdf | code:ap01 | format:pdf',0,NULL,'2026-06-06 10:28:45',NULL),(381,144,'download:https://pan.example.com/s/agent-full | code:af01 | format:pdf+code | group:included',0,NULL,'2026-06-06 10:28:45',NULL),(382,146,'download:https://pan.example.com/s/ai-full | code:ai01 | format:pdf+code | group:included',0,NULL,'2026-06-06 10:28:45',NULL),(383,148,'download:https://pan.example.com/s/openclaw-full | code:oc01 | platform:all | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(384,149,'download:https://pan.example.com/s/hermes-basic | code:hb01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(385,150,'download:https://pan.example.com/s/hermes-full | code:hf01 | readme:included',0,NULL,'2026-06-06 10:28:45',NULL),(386,152,'download:https://pan.example.com/s/lobechat-full | code:lf01 | platform:all | plugins:included',0,NULL,'2026-06-06 10:28:45',NULL),(387,153,'license:REG-2026-M9N2-P4R6-T8U1 | type:single | limit:10accounts',0,NULL,'2026-06-06 10:28:45',NULL),(388,156,'card-number:5167-XXXX-XXXX-1234 | cvv:789 | exp:06/29 | balance:$0 | region:US',0,NULL,'2026-06-06 10:28:45',NULL),(389,156,'card-number:5167-XXXX-XXXX-5678 | cvv:012 | exp:09/29 | balance:$0 | region:US',0,NULL,'2026-06-06 10:28:45',NULL),(390,157,'card-number:4111-XXXX-XXXX-1111 | cvv:111 | exp:01/30 | balance:$0 | region:US',0,NULL,'2026-06-06 10:28:45',NULL),(391,157,'card-number:4111-XXXX-XXXX-2222 | cvv:222 | exp:02/30 | balance:$0 | region:US',0,NULL,'2026-06-06 10:28:45',NULL),(392,158,'license:MAIL-2026-X7K8-L2M3-N5P4 | type:single | platforms:gmail+outlook',0,NULL,'2026-06-06 10:28:45',NULL),(393,159,'license:MAIL-2026-Q5RS-T7UV-W1XY | type:permanent | platforms:gmail+outlook+proton',0,NULL,'2026-06-06 10:28:45',NULL),(394,161,'wallet:TRC20-TXhash2026mN2pQrS4 | amount:50USDT | chain:TRC20',0,NULL,'2026-06-06 10:28:45',NULL),(395,161,'wallet:TRC20-TXhash2026aB3cD5eF | amount:50USDT | chain:TRC20',0,NULL,'2026-06-06 10:28:45',NULL),(396,162,'wallet:TRC20-TXhash2026pQrS4tU6 | amount:100USDT | chain:TRC20',0,NULL,'2026-06-06 10:28:45',NULL),(397,162,'wallet:TRC20-TXhash2026cD5eF7gH | amount:100USDT | chain:TRC20',0,NULL,'2026-06-06 10:28:45',NULL),(398,163,'wallet:ERC20-TXhash2026xK9mN2pQ | amount:10USDC | chain:ERC20',0,NULL,'2026-06-06 10:28:45',NULL),(399,163,'wallet:ERC20-TXhash2026aB3cD5eF | amount:10USDC | chain:ERC20',0,NULL,'2026-06-06 10:28:45',NULL),(400,164,'wallet:ERC20-TXhash2026pQrS4tU6 | amount:50USDC | chain:ERC20',0,NULL,'2026-06-06 10:28:45',NULL),(401,164,'wallet:ERC20-TXhash2026cD5eF7gH | amount:50USDC | chain:ERC20',0,NULL,'2026-06-06 10:28:45',NULL),(402,166,'REF-2026-OKX-XK9M2N | rebate:20% | bonus:blindbox',0,NULL,'2026-06-06 10:28:45',NULL),(403,166,'REF-2026-OKX-AB3C5D | rebate:20% | bonus:blindbox',0,NULL,'2026-06-06 10:28:45',NULL),(404,167,'REF-2026-BYBIT-XK9M2N | rebate:15% | bonus:newuser',0,NULL,'2026-06-06 10:28:45',NULL),(405,167,'REF-2026-BYBIT-AB3C5D | rebate:15% | bonus:newuser',0,NULL,'2026-06-06 10:28:45',NULL),(406,147,'download:https://pan.example.com/s/openclaw-docker | code:od01 | readme:included',0,NULL,'2026-06-06 10:28:57',NULL),(407,147,'download:https://pan.example.com/s/openclaw-docker-02 | code:od02 | readme:included',0,NULL,'2026-06-06 10:28:57',NULL),(408,128,'download:https://pan.example.com/s/ssm-takeout | code:st02 | readme:included',1,5,'2026-06-06 10:50:56',NULL),(409,134,'download:https://pan.example.com/s/claude-code-sold | code:cc02 | format:pdf+code',1,6,'2026-06-06 10:50:56',NULL),(410,57,'subscribe-url:https://sub.example.com/link/sold01 | traffic:100GB | expire:365days',1,7,'2026-06-06 10:50:56',NULL),(411,114,'download:https://pan.example.com/s/sb-blog-sold | code:sb02 | readme:included',1,8,'2026-06-06 10:50:56',NULL),(412,13,'account:claude-pro-auto-001@outlook.com | password:Cp@2026a01 | plan:pro',1,4,'2026-06-06 11:02:07',NULL);
+/*!40000 ALTER TABLE `card_key` ENABLE KEYS */;
+UNLOCK TABLES;
 
--- ========== 2. API与网络 ==========
-(16, 'OpenAI兼容 API 中转额度', 201,
-     '支持GPT-4o/o1/Claude/Gemini/DeepSeek等主流模型，按Token计费，无需翻墙，低延迟高可用。',
-     5.00, 18600, 1),
-(17, 'Claude API 中转额度', 201,
-     'Claude API中转服务，支持Claude 3.5全系列模型。高并发低延迟。',
-     8.00, 8200, 1),
-(18, 'DeepSeek API 额度', 201,
-     'DeepSeek官方API中转额度，支持V3/Chat/Coder。国产模型性价比之王。',
-     3.00, 6800, 1),
-(19, 'OpenAI SDK 充值卡', 202,
-     'OpenAI官方API预付费充值卡，$5/$10/$50/$100面额可选。',
-     38.00, 5200, 1),
-(20, 'Anthropic API 充值卡', 202,
-     'Anthropic官方API预付费充值卡，$5/$10/$25/$50面额可选。',
-     40.00, 3200, 1),
-(21, '机场订阅 月卡', 203,
-     '高速稳定机场节点，IPLC专线，Netflix/HBO/Disney+全解锁，不限速不限设备。支持Clash/V2Ray/Shadowrocket。',
-     15.00, 12000, 1),
-(22, '机场订阅 年卡', 203,
-     '机场年卡订阅，性价比最高。IPLC专线，全解锁，不限流量。',
-     128.00, 4800, 1),
-(23, '机场流量包', 203,
-     '机场额外流量加油包，100GB/500GB可选。即买即充，长期有效。',
-     10.00, 8600, 1),
-(24, '国内游戏加速器', 203,
-     'Steam/Epic/EA游戏加速，UU/迅游/雷神等主流品牌。月卡/季卡/年卡。',
-     8.00, 6400, 1),
+--
+-- Table structure for table `category`
+--
 
--- ========== 3. 账号与会员 ==========
-(25, 'Gmail 邮箱号', 301,
-     'Google Gmail成品号，已验证手机号，可正常使用Google全套服务。单个/10个打包/100个打包。',
-     1.50, 22000, 1),
-(26, 'Outlook/Hotmail 邮箱号', 301,
-     'Microsoft Outlook/Hotmail成品号，可正常使用Office Online、OneDrive等。',
-     0.80, 12000, 1),
-(27, 'ProtonMail 邮箱号', 301,
-     'ProtonMail加密邮箱成品号，端到端加密，瑞士隐私保护。',
-     2.00, 4200, 1),
-(28, 'Apple ID 成品号', 301,
-     'Apple ID成品号，港区/美区/土区/日区可选，可登录App Store、iCloud等全套服务。',
-     3.00, 7800, 1),
-(29, 'Twitter/X 账号', 302,
-     'Twitter/X成品号，已验证邮箱。新号/老号/10个打包可选。',
-     2.00, 5600, 1),
-(30, 'Telegram 账号', 302,
-     'Telegram成品号，已验证手机号。普通号/带Premium月卡可选。',
-     5.00, 3400, 1),
-(31, 'Netflix Premium 会员', 303,
-     'Netflix高级会员，4K UHD、4设备同时在线。土耳其区/阿根廷区低价开通。',
-     25.00, 4200, 1),
-(32, 'YouTube Premium 会员', 303,
-     'YouTube高级会员，免广告、后台播放、YouTube Music。土耳其区低价开通。',
-     18.00, 3600, 1),
-(33, 'Spotify Premium 会员', 303,
-     'Spotify高级会员，无广告、离线下载、高音质。土耳其区低价开通。',
-     15.00, 4800, 1),
-(34, 'Steam 钱包充值卡', 304,
-     'Steam平台钱包充值码，50/100/200元面额。全球区通用。',
-     30.00, 6800, 1),
-(35, 'Xbox Game Pass Ultimate', 304,
-     'Xbox终极会员，含Xbox+PC+云游戏库+EA Play。土耳其区低价开通。',
-     28.00, 2200, 1),
-(36, 'Microsoft 365 个人版', 305,
-     'M365个人订阅，含Word/Excel/PPT/Outlook + 1TB OneDrive。土耳其区低价开通。',
-     35.00, 5200, 1),
-(37, 'JetBrains 全家桶激活', 305,
-     'JetBrains全系列IDE激活码，IDEA/WebStorm/PyCharm/GoLand/PhpStorm等。',
-     45.00, 4800, 1),
-(38, 'Adobe Creative Cloud 全套', 305,
-     'Adobe创意云全家桶，PS/AI/PR/AE等20+应用。',
-     68.00, 2200, 1),
-(39, 'GitHub Pro 会员', 305,
-     'GitHub Pro，含Copilot、高级代码分析、无限协作者。',
-     18.00, 3400, 1),
-(40, 'iCloud+ 200GB', 305,
-     'Apple iCloud+ 200GB云存储，含Private Relay、隐藏邮箱。',
-     12.00, 2600, 1),
+DROP TABLE IF EXISTS `category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `category` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `parent_id` int DEFAULT '0',
+  `sort_order` int DEFAULT '0',
+  `status` tinyint DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=604 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- ========== 4. 课设与毕设 ==========
-(41, 'SSM 管理系统', 401,
-     '基于Spring+SpringMVC+MyBatis。含完整源码、数据库SQL、需求文档、答辩PPT。图书/选课/商城/宠物医院/酒店/停车场可选。',
-     19.90, 8800, 1),
-(42, 'SpringBoot 管理系统', 401,
-     '基于SpringBoot+MyBatis-Plus。Vue/Thymeleaf前端可选。博客/外卖/考试/论坛/医疗/人事可选。',
-     24.90, 7200, 1),
-(43, 'Python Web 项目', 402,
-     '基于Flask/Django。Flask博客/Django电商/爬虫可视化/Flask聊天室可选。',
-     14.90, 5600, 1),
-(44, 'Vue/React 前端项目', 402,
-     'Vue3后台管理/React电商/Vue3个人主页可选。含完整源码和部署文档。',
-     19.90, 3800, 1),
-(45, '微信小程序项目', 402,
-     '配合SpringBoot后端。校园二手交易/外卖点餐/记账本可选。',
-     24.90, 4200, 1),
-(46, '蓝桥杯/比赛获奖项目', 403,
-     '历年比赛获奖项目源码，Web/大数据/AI/物联网方向均有覆盖。含文档和答辩材料。',
-     29.90, 2800, 1),
+--
+-- Dumping data for table `category`
+--
 
--- ========== 5. 知识付费 ==========
-(47, 'Claude Code 从入门到精通', 501,
-     'Claude Code CLI完全教程，安装配置、Hooks、MCP Server、多文件实战。附Skills模板。',
-     9.90, 4200, 1),
-(48, 'Cursor 实战指南', 501,
-     'Cursor AI IDE完全教程，Tab补全、Chat、Composer、.cursorrules模板大全。',
-     6.90, 3800, 1),
-(49, 'GitHub Copilot / Codex 实战', 501,
-     'Copilot和Codex编程实战教程，代码补全、Bug修复、代码审查、CI/CD集成。',
-     6.90, 3200, 1),
-(50, 'Skills 大全（1000+ Prompt模板）', 502,
-     '精选1000+高质量Prompt/Skills模板，编程/写作/绘画/办公/数据分析/营销/教育。持续更新。',
-     4.90, 12600, 1),
-(51, 'AI Agent 开发实战', 502,
-     'Agent从概念到落地，ReAct/Plan-and-Execute/Multi-Agent架构、LangChain/CrewAI/AutoGen实战。',
-     19.90, 2200, 1),
-(52, 'AI 从入门到入土——完全指南', 502,
-     'AI/大模型完全学习路线。基础概念、Prompt Engineering、RAG、Agent、微调、部署。适合非科班转行。',
-     19.90, 5800, 1),
+LOCK TABLES `category` WRITE;
+/*!40000 ALTER TABLE `category` DISABLE KEYS */;
+INSERT INTO `category` VALUES (1,'AI服务与账号',0,1,1),(2,'API与网络',0,2,1),(3,'账号与会员',0,3,1),(4,'课设与毕设',0,4,1),(5,'知识付费',0,5,1),(6,'工具与充值',0,6,1),(101,'ChatGPT / Claude',1,1,1),(102,'国产AI / 其他AI',1,2,1),(103,'AI绘画 / 音乐 / 视频',1,3,1),(104,'AI编程助手',1,4,1),(201,'API中转额度',2,1,1),(202,'SDK充值卡',2,2,1),(203,'机场 / 加速器',2,3,1),(301,'邮箱 / Apple ID',3,1,1),(302,'社交平台账号',3,2,1),(303,'流媒体会员',3,3,1),(304,'游戏平台',3,4,1),(305,'办公与开发工具',3,5,1),(401,'SSM / SpringBoot 项目',4,1,1),(402,'Python / 前端 / 小程序',4,2,1),(403,'比赛项目 / 大作业',4,3,1),(501,'AI编程工具教程',5,1,1),(502,'Skills / Prompt / 课程',5,2,1),(601,'一键部署包',6,1,1),(602,'注册机 / 0刀卡 / 脚本',6,2,1),(603,'区块链 / 虚拟币',6,3,1);
+/*!40000 ALTER TABLE `category` ENABLE KEYS */;
+UNLOCK TABLES;
 
--- ========== 6. 工具与充值 ==========
-(53, 'OpenClaw 一键部署包', 601,
-     'OpenClaw开源AI助手一键部署，Docker/Vercel/Zeabur。含配置教程。',
-     5.90, 3200, 1),
-(54, 'Hermes 一键部署包', 601,
-     'Hermes消息推送一键部署，支持微信/钉钉/飞书/Telegram多渠道。',
-     3.90, 2400, 1),
-(55, 'LobeChat 一键部署包', 601,
-     'LobeChat开源AI聊天框架部署，多模型接入、插件市场、知识库。Docker/Vercel可选。',
-     8.90, 4600, 1),
-(56, 'ChatGPT 注册机', 602,
-     'ChatGPT批量注册自动化脚本，自动接码、邮箱验证、手机号绑定。单次/永久授权。',
-     29.90, 4800, 1),
-(57, '0刀虚拟信用卡', 602,
-     '0美元预授权虚拟信用卡，可用于ChatGPT Plus等海外服务订阅验证。单张/5张/10张打包。',
-     5.00, 12800, 1),
-(58, '批量邮箱注册脚本', 602,
-     'Gmail/Outlook/ProtonMail批量注册自动化脚本。单次/永久授权。',
-     19.90, 3200, 1),
-(59, 'USDT (TRC20) 充值', 603,
-     'USDT泰达币TRC20链充值，小额快速到账。10/50/100 USDT。',
-     10.00, 6800, 1),
-(60, 'USDC (ERC20) 充值', 603,
-     'USDC美元稳定币ERC20链充值。10/50 USDC。',
-     10.00, 2400, 1),
-(61, 'Binance 邀请码', 603,
-     'Binance币安交易所邀请码，手续费20%返佣。附新手教程。',
-     1.00, 9200, 1),
-(62, 'OKX 邀请码', 603,
-     'OKX欧易交易所邀请码，手续费返佣+新用户盲盒福利。',
-     1.00, 7400, 1),
-(63, 'Bybit 邀请码', 603,
-     'Bybit交易所邀请码，手续费返佣+新用户奖励。',
-     1.00, 3600, 1);
+--
+-- Table structure for table `mall_order`
+--
 
--- ============================
--- SKU 规格
--- ============================
-INSERT INTO `product_sku` (`product_id`, `spec_name`, `price`, `stock`) VALUES
--- ChatGPT Free
-(1, '日抛（24h）', 0.50, 8000), (1, '月抛', 2.00, 3000), (1, '10个打包', 4.00, 1000),
--- ChatGPT Plus
-(2, '日抛（24h）', 8.00, 5000), (2, '月抛（土区）', 45.00, 2000), (2, '月抛（阿区）', 38.00, 1500), (2, '季卡', 120.00, 800), (2, '年卡', 420.00, 300),
--- ChatGPT Pro
-(3, '月抛', 188.00, 500), (3, '季卡', 488.00, 200),
--- Claude Free
-(4, '日抛', 1.00, 5000), (4, '月抛', 5.00, 2000),
--- Claude Pro
-(5, '月抛', 88.00, 1200), (5, '季卡', 238.00, 500), (5, '年卡', 828.00, 150),
--- Claude Max
-(6, '月抛', 288.00, 200), (6, '季卡', 788.00, 80),
--- DeepSeek
-(7, '日抛', 2.00, 5000), (7, '月抛', 8.00, 2000), (7, '10个打包', 15.00, 500),
--- Kimi
-(8, '日抛', 3.00, 3000), (8, '月抛', 12.00, 1500),
--- Gemini
-(9, '月抛', 48.00, 600), (9, '季卡', 128.00, 250),
--- Midjourney
-(10, 'Basic 月卡', 35.00, 600), (10, 'Standard 月卡', 55.00, 400), (10, 'Pro 月卡', 138.00, 150),
--- SD云端
-(11, '基础GPU 月卡', 15.00, 500), (11, '高级GPU 月卡', 35.00, 200),
--- Suno
-(12, 'Pro 月卡', 18.00, 500), (12, 'Pro 年卡', 158.00, 150),
--- Runway
-(13, 'Standard 月卡', 35.00, 300), (13, 'Pro 月卡', 88.00, 100),
--- Cursor
-(14, '月抛', 28.00, 1000), (14, '年卡', 248.00, 400),
--- Windsurf
-(15, '月抛', 22.00, 600), (15, '年卡', 198.00, 200),
--- OpenAI中转
-(16, '充值10元', 10.00, 5000), (16, '充值50元', 48.00, 2000), (16, '充值100元', 92.00, 1000), (16, '充值500元', 440.00, 300),
--- Claude中转
-(17, '充值10元', 10.00, 3000), (17, '充值50元', 48.00, 1500), (17, '充值100元', 92.00, 600),
--- DeepSeek API
-(18, '充值10元', 10.00, 3000), (18, '充值50元', 45.00, 1200),
--- OpenAI SDK
-(19, '$5 充值卡', 38.00, 1000), (19, '$10 充值卡', 72.00, 600), (19, '$50 充值卡', 350.00, 250), (19, '$100 充值卡', 680.00, 100),
--- Anthropic SDK
-(20, '$5 充值卡', 40.00, 800), (20, '$10 充值卡', 75.00, 400), (20, '$50 充值卡', 360.00, 150),
--- 机场月卡
-(21, '基础版 100G/月', 15.00, 3000), (21, '标准版 300G/月', 25.00, 2000), (21, '旗舰版 不限流量', 45.00, 1000),
--- 机场年卡
-(22, '基础版 100G/月', 128.00, 1000), (22, '标准版 300G/月', 198.00, 800), (22, '旗舰版 不限流量', 388.00, 400),
--- 流量包
-(23, '100GB', 10.00, 5000), (23, '500GB', 35.00, 2000),
--- 加速器
-(24, '月卡', 8.00, 3000), (24, '季卡', 20.00, 1500), (24, '年卡', 68.00, 600),
--- Gmail
-(25, '单个', 1.50, 8000), (25, '10个打包', 12.00, 2000), (25, '100个打包', 99.00, 500),
--- Outlook
-(26, '单个', 0.80, 8000), (26, '10个打包', 6.00, 2000), (26, '50个打包', 25.00, 500),
--- ProtonMail
-(27, '单个', 2.00, 3000), (27, '10个打包', 16.00, 800),
--- Apple ID
-(28, '港区', 3.00, 3000), (28, '美区', 3.50, 2000), (28, '土区', 2.50, 2000), (28, '日区', 3.00, 1500),
--- Twitter
-(29, '新号（0粉）', 2.00, 3000), (29, '老号（100+粉）', 8.00, 800), (29, '10个打包', 15.00, 500),
--- Telegram
-(30, '普通号', 5.00, 2000), (30, '带Premium月卡', 18.00, 800),
--- Netflix
-(31, '标准版 月卡（1屏）', 25.00, 800), (31, '高级版 月卡（4屏4K）', 45.00, 500), (31, '高级版 季卡', 120.00, 250),
--- YouTube
-(32, '个人版 月卡', 18.00, 1000), (32, '个人版 季卡', 45.00, 500), (32, '家庭版 月卡（5人）', 28.00, 300),
--- Spotify
-(33, '个人版 月卡', 15.00, 1200), (33, '个人版 季卡', 38.00, 600), (33, '个人版 年卡', 128.00, 300),
--- Steam
-(34, '50元面额', 46.00, 1000), (34, '100元面额', 92.00, 800), (34, '200元面额', 183.00, 400),
--- Xbox
-(35, 'Ultimate 月卡', 28.00, 600), (35, 'Ultimate 季卡', 75.00, 300), (35, 'PC版 月卡', 18.00, 400),
--- M365
-(36, '个人版 年卡', 168.00, 800), (36, '家庭版 年卡（6人）', 238.00, 500),
--- JetBrains
-(37, '单年授权', 45.00, 800), (37, '永久授权', 199.00, 250),
--- Adobe
-(38, '全套 月卡', 68.00, 400), (38, '全套 年卡', 588.00, 150), (38, '单应用 月卡（PS）', 35.00, 300),
--- GitHub
-(39, 'Pro 月卡', 18.00, 800), (39, 'Pro 年卡', 168.00, 400),
--- iCloud
-(40, '200GB 月卡', 12.00, 800), (40, '2TB 月卡', 35.00, 300),
--- SSM
-(41, '图书管理系统', 19.90, 600), (41, '学生选课系统', 19.90, 500), (41, '在线商城系统', 24.90, 400), (41, '宠物医院系统', 19.90, 450), (41, '酒店管理系统', 19.90, 380), (41, '停车场管理系统', 19.90, 320),
--- SpringBoot
-(42, '个人博客系统', 24.90, 800), (42, '外卖点餐系统', 29.90, 600), (42, '在线考试系统', 24.90, 500), (42, '社区论坛系统', 24.90, 420), (42, '在线医疗挂号', 29.90, 350), (42, '人事管理系统', 24.90, 380),
--- Python
-(43, 'Flask博客系统', 14.90, 500), (43, 'Django电商平台', 19.90, 400), (43, '爬虫+数据可视化', 14.90, 600), (43, 'Flask在线聊天室', 14.90, 350),
--- 前端
-(44, 'Vue3后台管理系统', 19.90, 600), (44, 'React电商前台', 19.90, 400), (44, 'Vue3个人主页', 14.90, 500),
--- 小程序
-(45, '校园二手交易', 24.90, 500), (45, '外卖点餐', 29.90, 400), (45, '记账本', 19.90, 450),
--- 比赛
-(46, 'Web开发类', 29.90, 300), (46, '大数据分析类', 34.90, 200), (46, 'AI应用类', 39.90, 150), (46, '物联网/嵌入式', 34.90, 120),
--- Claude Code
-(47, '基础版（PDF+代码）', 9.90, 1500), (47, '完整版（PDF+代码+视频）', 19.90, 800),
--- Cursor
-(48, 'PDF教程', 6.90, 1200), (48, 'PDF+视频', 14.90, 600),
--- Copilot/Codex
-(49, 'PDF教程', 6.90, 1000), (49, 'PDF+视频', 14.90, 500),
--- Skills
-(50, '基础版 300条', 4.90, 3000), (50, '完整版 500+条', 9.90, 2000), (50, '至尊版 1000+条', 19.90, 800),
--- AI Agent
-(51, 'PDF电子书', 19.90, 500), (51, 'PDF+代码+社群', 39.90, 200),
--- AI完全指南
-(52, 'PDF电子书', 19.90, 1500), (52, 'PDF+代码+社群', 39.90, 800),
--- OpenClaw
-(53, 'Docker版', 5.90, 1000), (53, '全平台版含教程', 12.90, 500),
--- Hermes
-(54, '基础版', 3.90, 800), (54, '完整版含教程', 8.90, 400),
--- LobeChat
-(55, 'Docker版', 8.90, 1200), (55, '全平台版含插件配置', 18.90, 600),
--- 注册机
-(56, '单次授权', 29.90, 800), (56, '永久授权', 99.00, 300),
--- 0刀卡
-(57, '单张', 5.00, 5000), (57, '5张打包', 20.00, 2000), (57, '10张打包', 35.00, 800),
--- 批量邮箱
-(58, '单次授权', 19.90, 500), (58, '永久授权', 69.00, 200),
--- USDT
-(59, '10 USDT', 72.00, 3000), (59, '50 USDT', 355.00, 1000), (59, '100 USDT', 700.00, 500),
--- USDC
-(60, '10 USDC', 73.00, 1000), (60, '50 USDC', 360.00, 400),
--- Binance/OKX/Bybit
-(61, '邀请码 x1', 1.00, 8000),
-(62, '邀请码 x1', 1.00, 6000),
-(63, '邀请码 x1', 1.00, 3000);
+DROP TABLE IF EXISTS `mall_order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mall_order` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(32) NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `contact` varchar(100) NOT NULL,
+  `query_password` varchar(100) DEFAULT NULL,
+  `pay_method` varchar(20) DEFAULT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  `status` tinyint DEFAULT '0',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `pay_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `order_no` (`order_no`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_contact` (`contact`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- ============================
--- 卡密示例
--- ============================
-INSERT INTO `card_key` (`sku_id`, `content`, `status`) VALUES
-(1,  'account:gpt-free-001@outlook.com | password:Gp@2026fR1e', 0),
-(1,  'account:gpt-free-002@outlook.com | password:Gp@2026eE3d', 0),
-(4,  'account:gpt-plus-tr-001@outlook.com | password:Pl@2026tR7k | region:TR', 0),
-(4,  'account:gpt-plus-tr-002@outlook.com | password:Pl@2026tR9m | region:TR', 0),
-(9,  'account:claude-pro-001@proton.me | password:Cl@2026pR1o | plan:pro', 0),
-(9,  'account:claude-pro-002@proton.me | password:Cl@2026pR3p | plan:pro', 0),
-(14, 'account:deepseek-001@gmail.com | password:Ds@2026aC1b', 0),
-(14, 'account:deepseek-002@gmail.com | password:Ds@2026cD3e', 0),
-(22, 'account:midjourney-001@outlook.com | password:Mj@2026vR1a', 0),
-(27, 'account:cursor-pro-001@outlook.com | password:Cu@2026pR1o', 0),
-(30, 'account:gmail-001@gmail.com | password:Gm@2026aC1b | recovery:已设置', 0),
-(30, 'account:gmail-002@gmail.com | password:Gm@2026cD3e | recovery:已设置', 0),
-(38, 'account:proton-001@proton.me | password:Pm@2026eN1c', 0),
-(42, 'account:appleid-001@icloud.com | password:Ap@2026iD1h | region:HK', 0),
-(42, 'account:appleid-002@icloud.com | password:Ap@2026iD3j | region:US', 0),
-(49, 'api-key:demo-key-openai-2026xK9mN2pQrS4tU6vW | balance:10CNY', 0),
-(49, 'api-key:demo-key-openai-2026aB3cD5eF7gH9iJ1k | balance:10CNY', 0),
-(61, 'api-key:demo-key-anthropic-2026xK9mN2pQrS4tU6vW | balance:10CNY', 0),
-(66, 'OPENAI-SDK-2026-XK9M-NP4R-S6TU-$5', 0),
-(66, 'OPENAI-SDK-2026-AB3C-D5EF-G7HI-$5', 0),
-(72, 'subscribe-url:https://sub.example.com/link/abc123 | 100GB', 0),
-(72, 'subscribe-url:https://sub.example.com/link/def456 | 100GB', 0),
-(81, 'STEAM-WALLET-2026-XK9M-NP4R-S6TU-W8VX', 0),
-(81, 'STEAM-WALLET-2026-AB3C-D5EF-G7HI-J1KL', 0),
-(90, 'XBOX-GPU-2026-M9N2-P4R6-T8U1-V3W5', 0),
-(93, 'M365-PERSONAL-2026-KX9M-2NP4-RS4T-U6VW', 0),
-(93, 'M365-PERSONAL-2026-AB3C-5D7E-F9G1-H3I5', 0),
-(95, 'JET-2026-XK9M-NP4R-S6TU-W8VX-Y1ZA-B3CD', 0),
-(95, 'JET-2026-EF7G-H9IJ-K1LM-N3OP-Q5RS-T7UV', 0),
-(98, 'ADOBE-CC-2026-001@creative.cloud | license:ad-xk9m2np4', 0),
-(123, 'REF-2026-BINANCE-XK9M2N', 0),
-(123, 'REF-2026-BINANCE-AB3C5D', 0),
-(128, 'download:https://pan.example.com/s/ssm-library-001 | code:km9n', 0),
-(128, 'download:https://pan.example.com/s/ssm-course-001 | code:pq3r', 0),
-(137, 'download:https://pan.example.com/s/springboot-blog | code:xk9m', 0),
-(145, 'download:https://pan.example.com/s/flask-blog | code:ab3c', 0),
-(163, 'download:https://pan.example.com/s/claude-code-basic | code:ef7g', 0),
-(171, 'download:https://pan.example.com/s/skills-500 | code:hj1k', 0),
-(186, 'card-number:4532-XXXX-XXXX-7890 | cvv:123 | exp:12/28 | balance:$0', 0),
-(186, 'card-number:4532-XXXX-XXXX-3456 | cvv:456 | exp:03/29 | balance:$0', 0);
+--
+-- Dumping data for table `mall_order`
+--
 
--- ============================
--- 示例订单
--- ============================
-INSERT INTO `mall_order` (`id`, `order_no`, `user_id`, `contact`, `query_password`, `pay_method`, `total_price`, `status`, `create_time`, `pay_time`) VALUES
-(1,  '202606010915300001', 1, '13800138000', 'abc123', 'wechat',  8.00,   2, '2026-06-01 09:15:30', '2026-06-01 09:16:05'),
-(2,  '202606011422000002', 2, 'maple_leaf@qq.com', 'def456', 'alipay',  45.00,  2, '2026-06-01 14:22:00', '2026-06-01 14:23:10'),
-(3,  '202606021030450003', 3, '15800158002', 'ghi789', 'wechat',  28.00,  2, '2026-06-02 10:30:45', '2026-06-02 10:31:20'),
-(4,  '202606021800000004', 1, '13800138000', 'jkl012', 'alipay',  88.00,  1, '2026-06-02 18:00:00', '2026-06-02 18:01:30'),
-(5,  '202606030845000005', 4, 'rua_cute@gmail.com', NULL, NULL, 19.90,  0, '2026-06-03 08:45:00', NULL),
-(6,  '202606031100000006', 5, 'breeze@outlook.com', 'mno345', 'wechat', 128.00,  2, '2026-06-03 11:00:00', '2026-06-03 11:02:15'),
-(7,  '202606040920000007', 6, 'xiaohong@outlook.com', NULL, NULL,  24.90,  3, '2026-06-04 09:20:00', NULL);
+LOCK TABLES `mall_order` WRITE;
+/*!40000 ALTER TABLE `mall_order` DISABLE KEYS */;
+INSERT INTO `mall_order` VALUES (1,'202606010915300001',1,'13800138000','abc123','wechat',8.00,2,'2026-06-01 09:15:30','2026-06-01 09:16:05'),(2,'202606011422000002',2,'maple_leaf@qq.com','def456','alipay',45.00,2,'2026-06-01 14:22:00','2026-06-01 14:23:10'),(3,'202606021030450003',3,'15800158002','ghi789','wechat',28.00,2,'2026-06-02 10:30:45','2026-06-02 10:31:20'),(4,'202606021800000004',1,'13800138000','jkl012','alipay',88.00,2,'2026-06-02 18:00:00','2026-06-06 11:02:07'),(5,'202606030845000005',4,'rua_cute@gmail.com',NULL,NULL,19.90,0,'2026-06-03 08:45:00',NULL),(6,'202606031100000006',5,'breeze@outlook.com','mno345','wechat',128.00,2,'2026-06-03 11:00:00','2026-06-03 11:02:15'),(7,'202606040920000007',6,'xiaohong@outlook.com',NULL,NULL,24.90,3,'2026-06-04 09:20:00',NULL),(8,'202606061000000008',2,'maple_leaf@qq.com',NULL,NULL,18.00,0,'2026-06-06 16:54:39',NULL),(9,'20260606170900124585203',NULL,'13245678901','111','wechat',1.50,2,'2026-06-06 17:09:00','2026-06-06 17:12:19');
+/*!40000 ALTER TABLE `mall_order` ENABLE KEYS */;
+UNLOCK TABLES;
 
-INSERT INTO `order_item` (`order_id`, `product_id`, `sku_id`, `product_name`, `spec_name`, `price`, `quantity`) VALUES
-(1, 2,  4,  'ChatGPT Plus 成品号', '日抛（24h）',          8.00,   1),
-(2, 10, 22, 'Midjourney 成品号',   'Basic 月卡',           45.00,  1),
-(3, 14, 27, 'Cursor Pro 成品号',   '月抛',                 28.00,  1),
-(4, 5,  9,  'Claude Pro 成品号',   '月抛',                 88.00,  1),
-(5, 41, 128,'SSM 管理系统',        '在线商城系统',          24.90,  1),
-(5, 47, 163,'Claude Code 从入门到精通','基础版（PDF+代码）',  9.90,  1),
-(6, 22, 72, '机场订阅 年卡',       '基础版 100G/月',       128.00, 1),
-(7, 42, 137,'SpringBoot 管理系统',  '个人博客系统',          24.90,  1);
+--
+-- Table structure for table `order_item`
+--
 
--- 更新已卖出的卡密状态及关联订单明细
--- order_item 1: sku_id=4 (ChatGPT Plus 日抛) → 卡密 id=3
-UPDATE `card_key` SET `status` = 1, `order_item_id` = 1, `sell_time` = '2026-06-01 09:16:05' WHERE `id` = 3;
--- order_item 2: sku_id=22 (Midjourney Basic 月卡) → 卡密 id=9
-UPDATE `card_key` SET `status` = 1, `order_item_id` = 2, `sell_time` = '2026-06-01 14:23:10' WHERE `id` = 9;
--- order_item 3: sku_id=27 (Cursor Pro 月抛) → 卡密 id=10
-UPDATE `card_key` SET `status` = 1, `order_item_id` = 3, `sell_time` = '2026-06-02 10:31:20' WHERE `id` = 10;
--- order_item 4: sku_id=9 (Claude Pro 月抛) → 卡密 id=5
-UPDATE `card_key` SET `status` = 1, `order_item_id` = 4, `sell_time` = '2026-06-02 18:01:30' WHERE `id` = 5;
+DROP TABLE IF EXISTS `order_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_item` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `sku_id` int NOT NULL,
+  `product_name` varchar(200) NOT NULL,
+  `spec_name` varchar(100) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `quantity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_order` (`order_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- 更新商品销量（已示例订单中涉及的商品）
-UPDATE `product` SET `sales` = `sales` + 1 WHERE `id` IN (2, 5, 10, 14, 22, 41, 42, 47);
+--
+-- Dumping data for table `order_item`
+--
+
+LOCK TABLES `order_item` WRITE;
+/*!40000 ALTER TABLE `order_item` DISABLE KEYS */;
+INSERT INTO `order_item` VALUES (1,1,2,5,'ChatGPT Plus 成品号','月抛（土区）',8.00,1),(2,2,10,21,'Midjourney 成品号','日抛',45.00,1),(3,3,14,34,'Cursor Pro 成品号','月抛',28.00,1),(4,4,5,9,'Claude Pro 成品号','月抛',88.00,1),(5,5,41,128,'SSM 管理系统','在线商城系统',24.90,1),(6,5,47,163,'Claude Code 从入门到精通','基础版（PDF+代码）',9.90,1),(7,6,22,72,'机场订阅 年卡','基础版 100G/月',128.00,1),(8,7,42,137,'SpringBoot 管理系统','个人博客系统',24.90,1),(9,9,25,65,'Gmail 邮箱号【已验机 / 美区】','单个',1.50,1);
+/*!40000 ALTER TABLE `order_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `product`
+--
+
+DROP TABLE IF EXISTS `product`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `product` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL,
+  `category_id` int NOT NULL,
+  `description` text,
+  `image` varchar(255) DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `sales` int DEFAULT '0',
+  `status` tinyint DEFAULT '1',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_category` (`category_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product`
+--
+
+LOCK TABLES `product` WRITE;
+/*!40000 ALTER TABLE `product` DISABLE KEYS */;
+INSERT INTO `product` VALUES (1,'ChatGPT Free 成品号【GPT-3.5】',101,'OpenAI官方注册的成品账号，已完成邮箱验证与手机号绑定，可直接登录 chat.openai.com 使用GPT-3.5免费版。支持网页端+App端双平台。适合临时使用、批量测试、API体验等场景。\n\n▸ 账号类型：邮箱+手机双验证成品号\n▸ 支持平台：Web / iOS / Android\n▸ 使用限制：免费版GPT-3.5，无GPT-4权限\n▸ 注意事项：请勿修改密码，违规操作导致封号不予售后','pics01.jpg',0.50,15200,1,'2026-06-05 21:44:36'),(2,'ChatGPT Plus 成品号【GPT-4o / 土区】',101,'已订阅Plus会员的ChatGPT成品号，支持GPT-4o、GPT-4、DALL·E 3图片生成、高级数据分析、联网搜索、插件市场等全部Plus功能。采用土耳其区/阿根廷区低价订阅方案，性价比极高。\n\n▸ 核心模型：GPT-4o / GPT-4 / GPT-4-Turbo\n▸ 图片生成：DALL·E 3 无限制\n▸ 插件市场：支持联网、代码解释器、文件分析\n▸ 上下文长度：128K tokens\n▸ 注意事项：共享账号请勿修改密码/绑定手机','pics02.jpg',8.00,12801,1,'2026-06-05 21:44:36'),(3,'ChatGPT Pro 成品号【o1 / o3 推理模型】',101,'OpenAI最高级别的Pro订阅成品号，支持o1、o1-mini、o3、o4-mini等全部推理模型无限制使用，以及GPT-4o无限制访问。Pro订阅是OpenAI面向重度用户和开发者的顶级方案。\n\n▸ 推理模型：o1 / o1-mini / o3 / o4-mini 全部无限制\n▸ GPT-4o：无限制使用，无3小时80条限制\n▸ 适用场景：复杂推理、数学证明、代码调试、学术研究\n▸ 账号来源：官方渠道订阅，稳定可靠','pics03.jpg',188.00,3600,1,'2026-06-05 21:44:36'),(4,'Claude Free 成品号【Haiku 免费版】',101,'Anthropic官方注册的Claude成品号，已完成邮箱验证。支持Claude 3.5 Haiku免费使用，每日有一定用量限制。适合轻度使用、体验Claude对话能力。\n\n▸ 账号类型：邮箱验证成品号\n▸ 支持模型：Claude 3.5 Haiku（免费）\n▸ 使用限制：每日对话次数有限\n▸ 适用场景：日常问答、文本润色、轻度编程辅助','pics04.jpg',1.00,8200,1,'2026-06-05 21:44:36'),(5,'Claude Pro 成品号【Sonnet / Opus 全量】',101,'已订阅Pro的Claude成品号，支持Claude 3.5 Sonnet/Opus全量使用，5倍免费版用量，200K上下文窗口。Pro订阅是Anthropic面向专业用户的付费方案，支持长文档分析和复杂任务。\n\n▸ 核心模型：Claude 3.5 Sonnet / Claude 3 Opus\n▸ 用量：5倍免费版（约45条Sonnet/8小时）\n▸ 上下文：200K tokens（约15万字）\n▸ 适用场景：长文档分析、论文写作、代码项目、复杂推理','pics05.jpg',88.00,5601,1,'2026-06-05 21:44:36'),(6,'Claude Max 成品号【Opus 无限量】',101,'Claude Max订阅成品号，拥有Anthropic全部模型的最高用量上限。Max是面向企业级和超级重度用户的方案，用量远超Pro。\n\n▸ 核心模型：全部模型无限制\n▸ 用量：约为Pro的5-20倍\n▸ 上下文：200K tokens\n▸ 适用场景：企业级AI应用、全天候开发、批量内容生成','bg01.webp',288.00,1200,1,'2026-06-05 21:44:36'),(7,'DeepSeek 成品号【V3 / R1 推理】',102,'深度求索DeepSeek官方注册的成品号，支持DeepSeek-V3通用对话和DeepSeek-R1深度推理模型。国产大模型中的天花板，中文理解能力极强，编程能力不输GPT-4。\n\n▸ 核心模型：DeepSeek-V3 / DeepSeek-R1\n▸ 特色能力：深度推理、数学证明、代码生成\n▸ 中文能力：中文场景下表现优于GPT-4\n▸ 性价比：国产模型定价，使用成本极低','bg05.webp',2.00,9800,1,'2026-06-05 21:44:36'),(8,'Kimi 成品号【200万字长上下文】',102,'月之暗面Kimi智能助手成品号，支持200万字超长上下文窗口，可一次性处理整本书籍或长篇论文。具备联网搜索、文件解析、多轮对话能力，适合文献研究和长文档处理。\n\n▸ 核心能力：200万字超长上下文\n▸ 联网搜索：实时获取网络信息\n▸ 文件处理：支持PDF/Word/Excel等格式解析\n▸ 适用场景：论文研读、书籍分析、报告撰写','bg10.webp',3.00,6400,1,'2026-06-05 21:44:36'),(9,'Gemini Advanced 成品号【2.5 Pro / 土区】',102,'Google Gemini Advanced成品号，支持Gemini 2.5 Pro和Flash模型，200万Token超长上下文。集成Google全家桶（Gmail、Drive、Docs），可直接分析Google云端文件。土耳其区低价订阅。\n\n▸ 核心模型：Gemini 2.5 Pro / 2.5 Flash\n▸ 上下文：200万tokens（业界最长）\n▸ Google生态：无缝集成Gmail/Drive/Docs\n▸ 多模态：支持图片/音频/视频理解','bg12.webp',18.00,2800,1,'2026-06-05 21:44:36'),(10,'Midjourney 成品号【V6.1 / 无限出图】',103,'Midjourney官方成品号，支持最新的V6.1模型，画质和一致性大幅提升。支持文生图、图生图、风格混合、局部重绘、扩图等全部功能。AI绘画领域的天花板。\n\n▸ 模型版本：Midjourney V6.1\n▸ 核心功能：文生图/图生图/风格混合/局部重绘\n▸ 出图速度：Fast模式约30秒/张\n▸ 适用场景：设计素材、概念艺术、社交媒体配图','bg13.webp',35.00,3201,1,'2026-06-05 21:44:36'),(11,'Stable Diffusion 云端版【SDXL / Flux】',103,'Stable Diffusion WebUI云端部署账号，预装SDXL和Flux等主流模型。开箱即用，无需本地GPU显卡。支持ControlNet、LoRA、文生图、图生图等全套工作流。\n\n▸ 预装模型：SDXL 1.0 / Flux.1 / Realistic Vision\n▸ 硬件配置：云端A100/A6000显卡\n▸ 存储空间：50GB模型空间\n▸ 适用场景：AI绘画、设计工作、模型训练','pics01.jpg',15.00,2400,1,'2026-06-05 21:44:36'),(12,'Suno AI 音乐生成【V4 / 月50首】',103,'Suno AI音乐生成平台成品号，V4模型支持生成包含人声、伴奏、混音的完整歌曲。支持中文、英文、日文等多语种歌词，可自定义曲风、节奏、情绪。\n\n▸ 模型版本：Suno V4\n▸ 生成质量：接近专业录音棚水准\n▸ 每日额度：约50首完整歌曲\n▸ 支持风格：流行/摇滚/电子/民谣/古典/说唱等','pics02.jpg',18.00,1800,1,'2026-06-05 21:44:36'),(13,'Runway Gen-3 视频生成【文生视频】',103,'Runway Gen-3 Alpha视频生成平台成品号，支持文字转视频、图片转视频、视频风格迁移。Gen-3模型在运动连贯性和画面质量上有重大突破。\n\n▸ 模型版本：Gen-3 Alpha\n▸ 核心功能：文生视频/图生视频/视频编辑\n▸ 视频时长：最长16秒/次\n▸ 适用场景：短视频制作、广告素材、创意内容','pics03.jpg',35.00,1200,1,'2026-06-05 21:44:36'),(14,'Cursor Pro 成品号【GPT-4 / Claude】',104,'Cursor Pro AI IDE成品号，基于GPT-4和Claude双引擎驱动。支持智能代码补全、Composer多文件编辑、全仓库理解、自然语言编程。开发者效率倍增神器。\n\n▸ AI引擎：GPT-4o / Claude 3.5 Sonnet\n▸ 核心功能：Tab补全 / Chat对话 / Composer多文件编辑\n▸ 用量：每月500次高级请求\n▸ 适用场景：全栈开发、代码重构、项目搭建','pics04.jpg',28.00,4801,1,'2026-06-05 21:44:36'),(15,'Windsurf Pro 成品号【Cascade Agent】',104,'Windsurf Pro AI IDE成品号，搭载Cascade多步骤Agent编程能力，可自主规划并执行复杂的多文件编辑任务。全仓库代码理解，上下文感知极强。\n\n▸ AI引擎：Cascade Agent（多步骤自主编程）\n▸ 核心能力：全仓库理解 / 多步骤规划 / 自动执行\n▸ 用量：每月500次高级请求\n▸ 适用场景：大型项目开发、跨文件重构、系统设计','pics05.jpg',22.00,2600,1,'2026-06-05 21:44:36'),(16,'OpenAI兼容 API 中转额度【全模型】',201,'支持GPT-4o、o1、Claude 3.5、Gemini 2.5、DeepSeek等20+主流模型的API中转服务。按Token实际计费，无需翻墙直连，低延迟高可用。兼容OpenAI SDK格式，一行代码切换。\n\n▸ 支持模型：GPT-4o / o1 / Claude / Gemini / DeepSeek / Llama 等20+\n▸ 接口协议：完全兼容OpenAI API格式\n▸ 网络延迟：国内直连<100ms\n▸ 计费方式：按Token实际用量计费','bg01.webp',5.00,18600,1,'2026-06-05 21:44:36'),(17,'Claude API 中转额度【3.5 全系列】',201,'Claude API官方级中转服务，支持Claude 3.5 Haiku/Sonnet/Opus全系列模型。高并发低延迟，适合生产环境接入。兼容Anthropic SDK格式。\n\n▸ 支持模型：Claude 3.5 Haiku / Sonnet / Opus\n▸ 并发能力：支持100+并发请求\n▸ 网络延迟：国内直连<80ms\n▸ 适用场景：AI应用开发、聊天机器人、内容生成','bg05.webp',8.00,8200,1,'2026-06-05 21:44:36'),(18,'DeepSeek API 额度【V3 / Coder】',201,'DeepSeek官方API中转额度，支持DeepSeek-V3通用对话和Coder编程专用模型。国产模型中性价比之王，编程能力仅次于GPT-4。\n\n▸ 支持模型：DeepSeek-V3 / DeepSeek-Coder / DeepSeek-Chat\n▸ 价格优势：约为GPT-4的1/50\n▸ 编程能力：HumanEval 评测排名前列\n▸ 适用场景：低成本AI应用、编程辅助、批量文本处理','bg10.webp',3.00,6800,1,'2026-06-05 21:44:36'),(19,'OpenAI SDK 充值卡【$5 / $10 / $50 / $100】',202,'OpenAI官方API预付费充值卡（Gift Card），可直接充值到OpenAI账户余额用于API调用。支持GPT-4o、DALL·E、Whisper等全部API服务。官方渠道，余额永不过期。\n\n▸ 面额选择：$5 / $10 / $50 / $100\n▸ 使用方式：登录OpenAI后台兑换\n▸ 适用范围：全部OpenAI API服务\n▸ 有效期：余额永不过期','bg12.webp',38.00,5200,1,'2026-06-05 21:44:36'),(20,'Anthropic API 充值卡【$5 / $10 / $50】',202,'Anthropic官方API预付费充值卡，可直接充值到Claude API账户余额。支持Claude 3.5全系列模型的API调用。适合开发者和企业用户。\n\n▸ 面额选择：$5 / $10 / $25 / $50\n▸ 使用方式：登录Anthropic Console兑换\n▸ 适用范围：Claude API全系列模型\n▸ 有效期：余额永不过期','bg13.webp',40.00,3200,1,'2026-06-05 21:44:36'),(21,'机场订阅 月卡【IPLC 专线】',203,'高速稳定机场节点订阅，采用IPLC国际专线，低延迟低丢包。全站Netflix/HBO/Disney+/YouTube Premium解锁，不限速不限设备数。支持Clash/V2Ray/Shadowrocket/Quantumult X等主流客户端。\n\n▸ 线路类型：IPLC国际专线 / IEPL以太网专线\n▸ 解锁服务：Netflix / HBO / Disney+ / YouTube Premium\n▸ 设备限制：不限设备数\n▸ 协议支持：Clash / V2Ray / Shadowrocket / Surge','homepic2.png',15.00,12000,1,'2026-06-05 21:44:36'),(22,'机场订阅 年卡【IPLC 专线 / 不限流量】',203,'机场年卡订阅方案，性价比最高。IPLC国际专线，全流媒体解锁，不限流量不限速。年付相当于10个月价格，适合长期稳定使用。\n\n▸ 线路类型：IPLC国际专线\n▸ 流量限制：不限流量\n▸ 解锁服务：全流媒体平台\n▸ 节点地区：香港/日本/新加坡/美国/台湾/韩国','homepic3.png',128.00,4801,1,'2026-06-05 21:44:36'),(23,'机场流量加油包【100GB / 500GB】',203,'机场额外流量加油包，适用于已订阅的机场用户。即买即充到账户，长期有效不清零。适合临时大流量需求（下载、看4K视频等）。\n\n▸ 面额选择：100GB / 500GB\n▸ 生效方式：购买后即时充入账户\n▸ 有效期：长期有效不清零\n▸ 适用对象：已订阅的机场用户','homepic4.png',10.00,8600,1,'2026-06-05 21:44:36'),(24,'游戏加速器【UU / 迅游 / 雷神】',203,'国内主流游戏加速器，支持Steam/Epic/EA/育碧等平台游戏加速。有效降低游戏延迟，解决丢包、卡顿、掉线等问题。UU加速器/迅游加速器/雷神加速器可选。\n\n▸ 支持平台：Steam / Epic / EA / 育碧 / Xbox / PS\n▸ 主流游戏：CS2 / DOTA2 / PUBG / Apex / GTA5 / 原神\n▸ 加速效果：延迟降低50-80ms\n▸ 品牌可选：UU / 迅游 / 雷神','homepic1.png',8.00,6400,1,'2026-06-05 21:44:36'),(25,'Gmail 邮箱号【已验机 / 美区】',301,'Google Gmail成品号，已完成手机号验证和辅助邮箱设置。可正常使用Google全套服务（Gmail、Google Drive、YouTube、Google Play等）。适合注册海外服务、接收验证码。\n\n▸ 账号状态：已验证手机号+辅助邮箱\n▸ 支持服务：Gmail / Drive / YouTube / Play / Maps\n▸ 适用场景：注册海外服务、接收验证码、开发测试\n▸ 注意事项：请勿频繁异地登录触发安全验证','pics01.jpg',1.50,22001,1,'2026-06-05 21:44:36'),(26,'Outlook 邮箱号【Office 365】',301,'Microsoft Outlook/Hotmail成品号，可正常使用Office Online、OneDrive 5GB、Microsoft Teams等全套微软服务。适合注册海外服务和日常通讯。\n\n▸ 账号状态：已验证邮箱\n▸ 支持服务：Outlook / OneDrive / Office Online / Teams\n▸ 适用场景：海外服务注册、商务邮件、开发测试\n▸ 注意事项：建议绑定辅助手机提高安全性','pics02.jpg',0.80,12000,1,'2026-06-05 21:44:36'),(27,'ProtonMail 邮箱号【端到端加密】',301,'ProtonMail加密邮箱成品号，基于瑞士隐私法律保护，端到端加密邮件内容。无需手机号注册，匿名性极强。适合注重隐私的用户。\n\n▸ 加密方式：端到端加密（E2EE）\n▸ 注册地：瑞士（受瑞士隐私法保护）\n▸ 匿名性：无需手机号，支持.onion暗网访问\n▸ 适用场景：隐私通讯、匿名注册、安全信息传递','pics03.jpg',2.00,4200,1,'2026-06-05 21:44:36'),(28,'Apple ID 成品号【港区 / 美区 / 日区】',301,'Apple ID成品号，已完成邮箱验证和安全设置。港区/美区/土区/日区可选，可登录App Store下载区服专属应用，使用iCloud、Apple Music等全套Apple服务。\n\n▸ 可选区服：港区 / 美区 / 土区 / 日区\n▸ 支持服务：App Store / iCloud / Apple Music / iMessage\n▸ 适用场景：下载区服限定应用、订阅低价服务\n▸ 注意事项：登录后请勿开启双重认证','pics04.jpg',3.00,7800,1,'2026-06-05 21:44:36'),(29,'Twitter/X 账号【已验证邮箱】',302,'Twitter/X平台成品号，已完成邮箱验证。新号（0粉）/ 老号（100+粉丝）/ 批量打包可选。适合海外营销、信息获取、社群运营。\n\n▸ 账号状态：已验证邮箱\n▸ 类型可选：新号（0粉）/ 老号（100+粉）/ 10个打包\n▸ 适用场景：海外营销、信息获取、AI训练数据\n▸ 注意事项：建议绑定手机号提高账号安全性','pics05.jpg',2.00,5600,1,'2026-06-05 21:44:36'),(30,'Telegram 账号【已验机】',302,'Telegram成品号，已完成手机号验证。普通号/带Premium月卡可选。Telegram Premium提供4GB文件上传、语音转文字、无广告等高级功能。\n\n▸ 账号状态：已验证手机号\n▸ 类型可选：普通号 / 带Premium月卡\n▸ Premium功能：4GB上传 / 语音转文字 / 无广告 / 高级表情\n▸ 适用场景：海外社群、频道订阅、隐私通讯','bg01.webp',5.00,3400,1,'2026-06-05 21:44:36'),(31,'Netflix Premium 会员【4K UHD / 土区】',303,'Netflix高级会员订阅，支持4K UHD超高清画质、4设备同时在线、离线下载。采用土耳其区/阿根廷区低价开通方案，月费仅需国内价格的1/3。\n\n▸ 画质：4K Ultra HD + HDR\n▸ 同屏数：4设备同时在线\n▸ 离线下载：支持6台设备离线\n▸ 区服优势：土区/阿区低价，全球内容库通用','bg05.webp',25.00,4200,1,'2026-06-05 21:44:36'),(32,'YouTube Premium 会员【免广告 / 土区】',303,'YouTube高级会员订阅，享受全站免广告播放、后台播放、离线下载、YouTube Music Premium音乐服务。土耳其区低价开通，月费不到国内价格的1/4。\n\n▸ 核心功能：全站免广告 + 后台播放 + 离线下载\n▸ YouTube Music：Premium音乐流媒体服务\n▸ 区服优势：土区低价月费\n▸ 支持平台：Web / iOS / Android / Smart TV','bg10.webp',18.00,3600,1,'2026-06-05 21:44:36'),(33,'Spotify Premium 会员【无损音质 / 土区】',303,'Spotify高级会员订阅，无广告播放、离线下载、320Kbps高音质。曲库超1亿首歌曲+500万播客。土耳其区低价开通。\n\n▸ 音质：最高320kbps OGG Vorbis\n▸ 曲库：1亿+首歌曲 + 500万播客\n▸ 核心功能：无广告 / 离线下载 / 无限切歌\n▸ 支持平台：全平台（Web/iOS/Android/桌面端/智能音箱）','bg12.webp',15.00,4800,1,'2026-06-05 21:44:36'),(34,'Steam 钱包充值卡【50 / 100 / 200 元】',304,'Steam平台官方钱包充值码，购买后在Steam客户端兑换即可。全球区通用，可用于购买游戏、DLC、游戏内物品等。无有效期限制。\n\n▸ 面额选择：50元 / 100元 / 200元\n▸ 使用方式：Steam客户端「钱包」-「兑换」\n▸ 适用范围：全球区通用（国区/港区/美区）\n▸ 有效期：无有效期限制','bg13.webp',30.00,6800,1,'2026-06-05 21:44:36'),(35,'Xbox Game Pass Ultimate【主机+PC+云游戏】',304,'Xbox终极会员Game Pass Ultimate，含Xbox主机游戏库+PC游戏库+云游戏+EA Play会员。400+款游戏畅玩，含Xbox第一方大作首发即玩。\n\n▸ 包含服务：Xbox主机库 / PC游戏库 / 云游戏 / EA Play\n▸ 游戏数量：400+款游戏畅玩\n▸ 首发即玩：Xbox第一方大作Day One可玩\n▸ 区服优势：土耳其区低价开通','pics01.jpg',28.00,5,1,'2026-06-05 21:44:36'),(36,'Microsoft 365 个人版【Word+Excel+PPT+1TB】',305,'Microsoft 365个人版订阅，含Word/Excel/PowerPoint/Outlook完整桌面版+1TB OneDrive云存储。支持5台设备同时使用，持续更新到最新版本。\n\n▸ 包含应用：Word / Excel / PowerPoint / Outlook（桌面版）\n▸ 云存储：1TB OneDrive\n▸ 设备数：5台设备同时使用\n▸ 区服优势：土耳其区低价开通','pics02.jpg',35.00,5,1,'2026-06-05 21:44:36'),(37,'JetBrains 全家桶激活码【IDEA / PyCharm 等】',305,'JetBrains全系列IDE激活码，支持IntelliJ IDEA / PyCharm / WebStorm / GoLand / PhpStorm / CLion / DataGrip等全部产品。正版激活，支持自动更新。\n\n▸ 支持产品：IDEA / PyCharm / WebStorm / GoLand / PhpStorm / CLion / DataGrip\n▸ 激活方式：离线激活码，无需联网验证\n▸ 授权类型：单年授权 / 永久授权可选\n▸ 注意事项：支持所有版本更新','pics03.jpg',45.00,5,1,'2026-06-05 21:44:36'),(38,'Adobe Creative Cloud 全套【PS+AI+PR+AE】',305,'Adobe创意云全家桶订阅，含Photoshop / Illustrator / Premiere Pro / After Effects / InDesign等20+款专业创意应用。正版授权，支持自动更新。\n\n▸ 包含应用：PS / AI / PR / AE / InDesign / XD / Lightroom 等20+\n▸ 云存储：100GB Adobe Cloud\n▸ 授权方式：正版订阅授权\n▸ 支持平台：Windows / macOS','pics04.jpg',68.00,5,1,'2026-06-05 21:44:36'),(39,'GitHub Pro 会员【Copilot + 高级分析】',305,'GitHub Pro会员订阅，含GitHub Copilot AI代码助手、高级代码分析、无限协作者、GitHub Pages自定义域名。开发者必备。\n\n▸ GitHub Copilot：AI代码补全和生成\n▸ 私有仓库：无限协作者\n▸ GitHub Pages：自定义域名支持\n▸ 高级分析：代码安全扫描和依赖分析','pics05.jpg',18.00,5,1,'2026-06-05 21:44:36'),(40,'iCloud+ 200GB【Private Relay / 隐藏邮箱】',305,'Apple iCloud+ 200GB云存储订阅，含Private Relay隐私中继、隐藏邮箱地址、HomeKit安全视频。iCloud照片图库、备份、文件同步全功能。\n\n▸ 存储空间：200GB（可升级至2TB）\n▸ Private Relay：Safari浏览隐私保护\n▸ 隐藏邮箱：生成随机邮箱地址转发\n▸ 适用场景：iPhone/iPad/Mac数据备份和同步','bg01.webp',12.00,5,1,'2026-06-05 21:44:36'),(41,'SSM 管理系统【图书/选课/商城/宠物/酒店】',401,'基于Spring + SpringMVC + MyBatis框架的完整管理系统。含完整源码、数据库SQL脚份、需求分析文档、答辩PPT模板。代码规范、注释完整，可直接用于课程设计/毕业设计答辩。\n\n▸ 技术栈：Spring + SpringMVC + MyBatis + MySQL + JSP\n▸ 可选项目：图书管理 / 学生选课 / 在线商城 / 宠物医院 / 酒店管理 / 停车场管理\n▸ 交付内容：完整源码 + SQL脚本 + 需求文档 + 答辩PPT\n▸ 附加服务：部署指导 + 答疑支持','project1.png',19.90,8801,1,'2026-06-05 21:44:36'),(42,'SpringBoot 管理系统【博客/外卖/考试/论坛】',401,'基于SpringBoot + MyBatis-Plus框架的现代化管理系统。Vue或Thymeleaf前端可选，RESTful API设计，支持前后端分离部署。代码注释完整，适合毕业设计和课程大作业。\n\n▸ 技术栈：SpringBoot + MyBatis-Plus + Vue/Thymeleaf + MySQL\n▸ 可选项目：个人博客 / 外卖点餐 / 在线考试 / 社区论坛 / 医疗挂号 / 人事管理\n▸ 交付内容：完整源码 + SQL脚本 + 部署文档 + 答辩PPT\n▸ 附加服务：部署指导 + 答疑支持','project21.png',24.90,7201,1,'2026-06-05 21:44:36'),(43,'Python Web 项目【Flask / Django】',402,'基于Python Flask或Django框架的Web项目。Flask博客/Django电商平台/爬虫数据可视化/Flask在线聊天室可选。代码结构清晰，含详细注释和部署文档。\n\n▸ 技术栈：Flask/Django + SQLite/MySQL + HTML/CSS/JS\n▸ 可选项目：Flask博客 / Django电商 / 爬虫+可视化 / Flask聊天室\n▸ 交付内容：完整源码 + 数据库 + 部署文档\n▸ 适用场景：Python课程设计、Web开发大作业','project31.png',14.90,8,1,'2026-06-05 21:44:36'),(44,'Vue/React 前端项目【后台管理/电商/主页】',402,'基于Vue3或React的前端项目，含完整路由、状态管理、权限控制。Vue3后台管理系统/React电商平台/Vue3个人主页可选。响应式布局，UI组件美观。\n\n▸ 技术栈：Vue3+Element Plus / React+Ant Design\n▸ 可选项目：Vue3后台管理 / React电商 / Vue3个人主页\n▸ 交付内容：完整源码 + 接口文档 + 部署指南\n▸ 附加特性：响应式布局 / 暗色主题 / 权限控制','project1.png',19.90,8,1,'2026-06-05 21:44:36'),(45,'微信小程序项目【SpringBoot 后端】',402,'微信小程序全栈项目，前端使用微信原生/Uni-app，后端SpringBoot + MyBatis。校园二手交易/外卖点餐/个人记账本可选。含小程序审核上架指导。\n\n▸ 技术栈：微信小程序 + SpringBoot + MyBatis + MySQL\n▸ 可选项目：校园二手交易 / 外卖点餐 / 记账本\n▸ 交付内容：前后端源码 + 数据库 + 接口文档 + 上架指导\n▸ 适用场景：小程序开发课程设计、毕业设计','project21.png',24.90,8,1,'2026-06-05 21:44:36'),(46,'比赛获奖项目【蓝桥杯 / 大数据 / AI】',403,'历年IT比赛获奖项目源码及文档，涵盖Web开发、大数据分析、AI应用、物联网/嵌入式等方向。含项目源码、设计文档、答辩材料、获奖心得分享。\n\n▸ 比赛类型：蓝桥杯 / 计算机设计大赛 / 软件杯 / 华为ICT\n▸ 方向覆盖：Web开发 / 大数据分析 / AI应用 / 物联网\n▸ 交付内容：源码 + 设计文档 + 答辩PPT + 获奖心得\n▸ 适用场景：比赛参考、学习借鉴、简历项目','project31.png',29.90,8,0,'2026-06-05 21:44:36'),(47,'Claude Code 从入门到精通【PDF+代码+视频】',501,'Claude Code CLI完全教程，从安装配置到高级实战。涵盖基础命令、Hooks系统、MCP Server集成、多文件项目实战、Skills模板开发。附赠50+个实用Skills模板。\n\n▸ 内容涵盖：安装配置 / 基础命令 / Hooks / MCP Server / Skills开发\n▸ 实战案例：5个完整项目实战\n▸ 附赠内容：50+ Skills模板 + 配置文件\n▸ 交付格式：PDF电子书 + 源码 + 视频教程（完整版）','bg05.webp',9.90,8,1,'2026-06-05 21:44:36'),(48,'Cursor 实战指南【Tab/Chat/Composer 全解】',501,'Cursor AI IDE完全实战教程，详解Tab智能补全、Chat对话编程、Composer多文件编辑三大核心功能。附赠100+个.cursorrules模板，覆盖前端/后端/全栈/数据科学等场景。\n\n▸ 内容涵盖：Tab补全 / Chat对话 / Composer编辑 / .cursorrules\n▸ 实战案例：10个真实项目开发实战\n▸ 附赠内容：100+ .cursorrules模板\n▸ 交付格式：PDF电子书 + 源码','bg10.webp',6.90,8,1,'2026-06-05 21:44:36'),(49,'GitHub Copilot / Codex 实战教程【AI编程】',501,'GitHub Copilot和Codex完全实战教程。详解代码补全、Bug修复、代码审查、测试生成、CI/CD集成等核心场景。从入门到高级用法全覆盖。\n\n▸ 内容涵盖：代码补全 / Bug修复 / 测试生成 / 代码审查 / CI集成\n▸ 工具覆盖：Copilot / Copilot Chat / Codex CLI\n▸ 实战案例：8个真实开发场景实战\n▸ 交付格式：PDF电子书 + 源码','bg12.webp',6.90,8,1,'2026-06-05 21:44:36'),(50,'Skills 大全【1000+ Prompt 模板】',502,'精选1000+高质量Prompt和Skills模板合集，涵盖编程开发、内容写作、AI绘画、办公效率、数据分析、营销推广、教育培训等10+个领域。持续更新，一次购买终身可用。\n\n▸ 模板数量：基础版300条 / 完整版500+条 / 至尊版1000+条\n▸ 覆盖领域：编程 / 写作 / 绘画 / 办公 / 数据 / 营销 / 教育\n▸ 更新频率：每周新增20+条\n▸ 适用平台：ChatGPT / Claude / Gemini / DeepSeek','bg13.webp',4.90,8,1,'2026-06-05 21:44:36'),(51,'AI Agent 开发实战【LangChain / CrewAI】',502,'AI Agent从概念到落地的完整开发教程。涵盖ReAct、Plan-and-Execute、Multi-Agent等架构模式，LangChain/CrewAI/AutoGen三大框架实战。含完整项目源码和社群答疑。\n\n▸ 架构模式：ReAct / Plan-and-Execute / Multi-Agent\n▸ 框架实战：LangChain / CrewAI / AutoGen\n▸ 实战项目：智能客服 / 自动化工作流 / 多Agent协作系统\n▸ 交付格式：PDF电子书 + 代码 + 社群答疑','pics01.jpg',19.90,8,1,'2026-06-05 21:44:36'),(52,'AI 从入门到入土——完全学习指南【零基础】',502,'AI/大模型最全面的自学路线图。从基础概念到Prompt Engineering、RAG检索增强、Agent开发、模型微调、本地部署，一步到位。适合零基础非科班转行AI领域。\n\n▸ 内容路线：基础概念 → Prompt工程 → RAG → Agent → 微调 → 部署\n▸ 实操环节：每个章节配实战练习\n▸ 学习周期：建议2-3个月完成\n▸ 适用人群：零基础 / 非科班 / 想转行AI的同学','pics03.jpg',19.90,8,1,'2026-06-05 21:44:36'),(53,'OpenClaw 一键部署包【Docker / Vercel】',601,'OpenClaw开源AI助手一键部署包，支持Docker本地部署和Vercel/Zeabur云端部署。预装多模型接入配置，开箱即用。含详细图文部署教程。\n\n▸ 部署方式：Docker / Vercel / Zeabur\n▸ 预装配置：OpenAI / Claude / DeepSeek 多模型\n▸ 功能特性：对话 / 插件 / 知识库 / 联网搜索\n▸ 交付内容：部署包 + 图文教程 + 配置模板','homepic2.png',5.90,8,1,'2026-06-05 21:44:36'),(54,'Hermes 消息推送部署包【微信/钉钉/飞书】',601,'Hermes多渠道消息推送系统一键部署包，支持微信公众号/企业微信/钉钉/飞书/Telegram等多渠道推送。适合个人通知、团队协作、自动化提醒。\n\n▸ 推送渠道：微信 / 企业微信 / 钉钉 / 飞书 / Telegram\n▸ 部署方式：Docker / Serverless / 本地\n▸ 功能特性：定时推送 / API触发 / 多渠道聚合\n▸ 交付内容：部署包 + 配置教程','homepic3.png',3.90,8,1,'2026-06-05 21:44:36'),(55,'LobeChat 一键部署包【多模型 / 插件市场】',601,'LobeChat开源AI聊天框架一键部署包，支持接入OpenAI/Claude/Gemini/DeepSeek等多模型。内置插件市场、知识库、文件对话等功能。Docker/Vercel部署可选。\n\n▸ 模型接入：OpenAI / Claude / Gemini / DeepSeek / Ollama\n▸ 功能特性：多模型切换 / 插件市场 / 知识库 / 文件对话\n▸ 部署方式：Docker / Vercel\n▸ 交付内容：部署包 + 配置教程 + 插件推荐列表','homepic4.png',8.90,5,1,'2026-06-05 21:44:36'),(56,'ChatGPT 批量注册机【自动接码/验证】',602,'ChatGPT批量注册自动化脚本，支持自动接码、邮箱验证、手机号绑定全流程。单次授权/永久授权可选。适合需要大量账号的工作室和团队。\n\n▸ 自动化流程：注册 → 邮箱验证 → 手机号绑定\n▸ 支持平台：OpenAI ChatGPT\n▸ 运行环境：Windows / macOS / Linux\n▸ 授权方式：单次授权 / 永久授权','pics02.jpg',29.90,5,1,'2026-06-05 21:44:36'),(57,'0刀虚拟信用卡【ChatGPT Plus 订阅验证】',602,'0美元预授权虚拟信用卡，可用于ChatGPT Plus、Claude Pro等海外AI服务的订阅验证。开卡即用，无需真实扣费。单张/5张/10张打包可选。\n\n▸ 开卡费：0美元预授权\n▸ 适用场景：ChatGPT Plus / Claude Pro / 海外订阅\n▸ 开卡数量：单张 / 5张打包 / 10张打包\n▸ 有效期：开卡后有效30天','pics04.jpg',5.00,5,1,'2026-06-05 21:44:36'),(58,'批量邮箱注册脚本【Gmail / Outlook】',602,'Gmail/Outlook/ProtonMail批量注册自动化脚本。支持自动接码、邮箱验证、辅助邮箱设置。单次授权/永久授权可选。\n\n▸ 支持平台：Gmail / Outlook / ProtonMail\n▸ 自动化流程：注册 → 手机验证 → 辅助邮箱\n▸ 运行环境：Windows / macOS / Linux\n▸ 授权方式：单次授权 / 永久授权','pics05.jpg',19.90,5,1,'2026-06-05 21:44:36'),(59,'USDT (TRC20) 充值【小额快速到账】',603,'USDT泰达币TRC20链充值服务，小额快速到账。TRC20链手续费低至1 USDT，适合日常交易和小额支付。10/50/100 USDT面额可选。\n\n▸ 链类型：TRC20（波场链）\n▸ 面额选择：10 / 50 / 100 USDT\n▸ 到账时间：5-15分钟\n▸ 手续费：TRC20链手续费约1 USDT','bg01.webp',10.00,5,1,'2026-06-05 21:44:36'),(60,'USDC (ERC20) 充值【以太坊链】',603,'USDC美元稳定币ERC20链充值服务。USDC由Circle发行，1:1锚定美元，合规性更强。适合DeFi和以太坊生态使用。\n\n▸ 链类型：ERC20（以太坊链）\n▸ 面额选择：10 / 50 USDC\n▸ 到账时间：5-30分钟（取决于Gas费）\n▸ 注意事项：ERC20链Gas费较高，建议小额用TRC20','bg05.webp',10.00,5,1,'2026-06-05 21:44:36'),(61,'Binance 邀请码【20% 手续费返佣】',603,'Binance币安交易所邀请码，注册即享20%手续费返佣优惠。附赠新手入门教程，涵盖注册、KYC认证、充值、交易全流程指南。\n\n▸ 返佣比例：20%手续费返佣\n▸ 适用对象：Binance新用户\n▸ 附赠内容：新手入门图文教程\n▸ 优势：终身返佣，交易越多省越多','bg10.webp',1.00,5,1,'2026-06-05 21:44:36'),(62,'OKX 邀请码【返佣 + 新用户盲盒】',603,'OKX欧易交易所邀请码，注册即享手续费返佣+新用户盲盒福利（最高100 USDT）。附赠新手教程和交易策略指南。\n\n▸ 返佣福利：手续费返佣\n▸ 新用户奖励：盲盒（最高100 USDT）\n▸ 附赠内容：新手教程 + 交易策略\n▸ 适用对象：OKX新用户','bg12.webp',1.00,5,1,'2026-06-05 21:44:36'),(63,'Bybit 邀请码【返佣 + 新用户奖励】',603,'Bybit交易所邀请码，注册即享手续费返佣+新用户任务奖励。Bybit是全球前五的加密货币交易所，衍生品交易深度优秀。\n\n▸ 返佣福利：手续费返佣\n▸ 新用户奖励：完成任务领取奖励\n▸ 附赠内容：新手入门教程\n▸ 平台优势：衍生品深度好 / 合约种类全','bg13.webp',1.00,5,1,'2026-06-05 21:44:36');
+/*!40000 ALTER TABLE `product` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `product_sku`
+--
+
+DROP TABLE IF EXISTS `product_sku`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `product_sku` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `spec_name` varchar(100) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `stock` int DEFAULT '0',
+  `status` tinyint DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `idx_product` (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=168 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product_sku`
+--
+
+LOCK TABLES `product_sku` WRITE;
+/*!40000 ALTER TABLE `product_sku` DISABLE KEYS */;
+INSERT INTO `product_sku` VALUES (1,1,'日抛（24h）',0.50,2,1),(2,1,'月抛',2.00,1,1),(3,1,'10个打包',4.00,5,1),(4,2,'日抛（24h）',8.00,1,1),(5,2,'月抛（土区）',45.00,2,1),(6,2,'月抛（阿区）',38.00,2,1),(7,2,'季卡',120.00,2,1),(8,2,'年卡',420.00,2,1),(9,3,'月抛',188.00,2,1),(10,3,'季卡',488.00,2,1),(11,4,'日抛',1.00,2,1),(12,4,'月抛',5.00,2,1),(13,5,'月抛',88.00,2,1),(14,5,'季卡',238.00,2,1),(15,5,'年卡',828.00,2,1),(16,6,'月抛',288.00,2,1),(17,6,'季卡',788.00,2,1),(18,7,'日抛',2.00,2,1),(19,7,'月抛',8.00,2,1),(20,7,'10个打包',15.00,3,1),(21,8,'日抛',3.00,2,1),(22,8,'月抛',12.00,2,1),(23,9,'月抛',48.00,2,1),(24,9,'季卡',128.00,2,1),(25,10,'Basic 月卡',35.00,2,1),(26,10,'Standard 月卡',55.00,2,1),(27,10,'Pro 月卡',138.00,2,1),(28,11,'基础GPU 月卡',15.00,2,1),(29,11,'高级GPU 月卡',35.00,2,1),(30,12,'Pro 月卡',18.00,2,1),(31,12,'Pro 年卡',158.00,2,1),(32,13,'Standard 月卡',35.00,2,1),(33,13,'Pro 月卡',88.00,2,1),(34,14,'月抛',28.00,2,1),(35,14,'年卡',248.00,2,1),(36,15,'月抛',22.00,2,1),(37,15,'年卡',198.00,2,1),(38,16,'充值10元',10.00,2,1),(39,16,'充值50元',48.00,2,1),(40,16,'充值100元',92.00,2,1),(41,16,'充值500元',440.00,2,1),(42,17,'充值10元',10.00,2,1),(43,17,'充值50元',48.00,2,1),(44,17,'充值100元',92.00,2,1),(45,18,'充值10元',10.00,2,1),(46,18,'充值50元',45.00,2,1),(47,19,'$5 充值卡',38.00,2,1),(48,19,'$10 充值卡',72.00,2,1),(49,19,'$50 充值卡',350.00,2,1),(50,19,'$100 充值卡',680.00,2,1),(51,20,'$5 充值卡',40.00,2,1),(52,20,'$10 充值卡',75.00,2,1),(53,20,'$50 充值卡',360.00,2,1),(54,21,'基础版 100G/月',15.00,2,1),(55,21,'标准版 300G/月',25.00,2,1),(56,21,'旗舰版 不限流量',45.00,2,1),(57,22,'基础版 100G/月',128.00,2,1),(58,22,'标准版 300G/月',198.00,2,1),(59,22,'旗舰版 不限流量',388.00,2,1),(60,23,'100GB',10.00,2,1),(61,23,'500GB',35.00,2,1),(62,24,'月卡',8.00,2,1),(63,24,'季卡',20.00,2,1),(64,24,'年卡',68.00,2,1),(65,25,'单个',1.50,1,1),(66,25,'10个打包',12.00,3,1),(67,25,'100个打包',99.00,2,1),(68,26,'单个',0.80,2,1),(69,26,'10个打包',6.00,2,1),(70,26,'50个打包',25.00,2,1),(71,27,'单个',2.00,2,1),(72,27,'10个打包',16.00,2,1),(73,28,'港区',3.00,2,1),(74,28,'美区',3.50,2,1),(75,28,'土区',2.50,2,1),(76,28,'日区',3.00,2,1),(77,29,'新号（0粉）',2.00,2,1),(78,29,'老号（100+粉）',8.00,2,1),(79,29,'10个打包',15.00,2,1),(80,30,'普通号',5.00,2,1),(81,30,'带Premium月卡',18.00,2,1),(82,31,'标准版 月卡（1屏）',25.00,2,1),(83,31,'高级版 月卡（4屏4K）',45.00,2,1),(84,31,'高级版 季卡',120.00,2,1),(85,32,'个人版 月卡',18.00,2,1),(86,32,'个人版 季卡',45.00,2,1),(87,32,'家庭版 月卡（5人）',28.00,2,1),(88,33,'个人版 月卡',15.00,2,1),(89,33,'个人版 季卡',38.00,2,1),(90,33,'个人版 年卡',128.00,2,1),(91,34,'50元面额',46.00,2,1),(92,34,'100元面额',92.00,2,1),(93,34,'200元面额',183.00,2,1),(94,35,'Ultimate 月卡',28.00,2,1),(95,35,'Ultimate 季卡',75.00,2,1),(96,35,'PC版 月卡',18.00,2,1),(97,36,'个人版 年卡',168.00,2,1),(98,36,'家庭版 年卡（6人）',238.00,2,1),(99,37,'单年授权',45.00,2,1),(100,37,'永久授权',199.00,2,1),(101,38,'全套 月卡',68.00,2,1),(102,38,'全套 年卡',588.00,2,1),(103,38,'单应用 月卡（PS）',35.00,2,1),(104,39,'Pro 月卡',18.00,2,1),(105,39,'Pro 年卡',168.00,2,1),(106,40,'200GB 月卡',12.00,2,1),(107,40,'2TB 月卡',35.00,2,1),(108,41,'图书管理系统',19.90,1,1),(109,41,'学生选课系统',19.90,1,1),(110,41,'在线商城系统',24.90,2,1),(111,41,'宠物医院系统',19.90,1,1),(112,41,'酒店管理系统',19.90,1,1),(113,41,'停车场管理系统',19.90,1,1),(114,42,'个人博客系统',24.90,2,1),(115,42,'外卖点餐系统',29.90,1,1),(116,42,'在线考试系统',24.90,1,1),(117,42,'社区论坛系统',24.90,1,1),(118,42,'在线医疗挂号',29.90,1,1),(119,42,'人事管理系统',24.90,1,1),(120,43,'Flask博客系统',14.90,1,1),(121,43,'Django电商平台',19.90,1,1),(122,43,'爬虫+数据可视化',14.90,1,1),(123,43,'Flask在线聊天室',14.90,1,1),(124,44,'Vue3后台管理系统',19.90,1,1),(125,44,'React电商前台',19.90,1,1),(126,44,'Vue3个人主页',14.90,1,1),(127,45,'校园二手交易',24.90,1,1),(128,45,'外卖点餐',29.90,1,1),(129,45,'记账本',19.90,1,1),(130,46,'Web开发类',29.90,1,1),(131,46,'大数据分析类',34.90,1,1),(132,46,'AI应用类',39.90,1,1),(133,46,'物联网/嵌入式',34.90,1,1),(134,47,'基础版（PDF+代码）',9.90,1,1),(135,47,'完整版（PDF+代码+视频）',19.90,1,1),(136,48,'PDF教程',6.90,1,1),(137,48,'PDF+视频',14.90,1,1),(138,49,'PDF教程',6.90,1,1),(139,49,'PDF+视频',14.90,1,1),(140,50,'基础版 300条',4.90,1,1),(141,50,'完整版 500+条',9.90,1,1),(142,50,'至尊版 1000+条',19.90,1,1),(143,51,'PDF电子书',19.90,1,1),(144,51,'PDF+代码+社群',39.90,1,1),(145,52,'PDF电子书',19.90,1,1),(146,52,'PDF+代码+社群',39.90,1,1),(147,53,'Docker版',5.90,2,1),(148,53,'全平台版含教程',12.90,1,1),(149,54,'基础版',3.90,1,1),(150,54,'完整版含教程',8.90,1,1),(151,55,'Docker版',8.90,1,1),(152,55,'全平台版含插件配置',18.90,1,1),(153,56,'单次授权',29.90,1,1),(154,56,'永久授权',99.00,1,1),(155,57,'单张',5.00,2,1),(156,57,'5张打包',20.00,2,1),(157,57,'10张打包',35.00,2,1),(158,58,'单次授权',19.90,1,1),(159,58,'永久授权',69.00,1,1),(160,59,'10 USDT',72.00,1,1),(161,59,'50 USDT',355.00,2,1),(162,59,'100 USDT',700.00,2,1),(163,60,'10 USDC',73.00,2,1),(164,60,'50 USDC',360.00,2,1),(165,61,'邀请码 x1',1.00,0,1),(166,62,'邀请码 x1',1.00,2,1),(167,63,'邀请码 x1',1.00,2,1);
+/*!40000 ALTER TABLE `product_sku` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `status` tinyint DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'testuser','e10adc3949ba59abbe56e057f20f883e','test@example.com','13800138000','2026-06-05 21:44:36',1),(2,'挽枫','6b8bde7d2a96c47cc8d26f363a63c9e4','maple_leaf@qq.com','13900139001','2026-06-05 21:44:36',1),(3,'薛梦凝','13b94bf5f44e1b204f0183f1b03aaba7','frost_dream@163.com','15800158002','2026-06-05 21:44:36',0),(4,'郑小rua','6bd9bd66cbc7bce35a0a61bae592795a','rua_cute@gmail.com','17700177003','2026-06-05 21:44:36',1),(5,'Wind','c6441e15f38cd5b6b39a9481d30ba727','breeze@outlook.com','18600186004','2026-06-05 21:44:36',1),(6,'xiaohong','efc064d0e61259bf69583f6e97708aa2','xiaohong@outlook.com',NULL,'2026-06-05 21:44:36',1);
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'virtual_mall'
+--
+
+--
+-- Dumping routines for database 'virtual_mall'
+--
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-06-19 12:20:12
