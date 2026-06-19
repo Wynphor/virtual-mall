@@ -48,7 +48,8 @@
         fetch('${pageContext.request.contextPath}/order/confirmPay', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: 'orderNo=${order.orderNo}'
+            body: 'orderNo=' + encodeURIComponent('${order.orderNo}') +
+                '&_csrf=' + encodeURIComponent('${csrfToken}')
         })
         .then(r => r.json())
         .then(data => {
